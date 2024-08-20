@@ -28,7 +28,7 @@
 .dark-mode {
     --color-background: #181a1e;
     --color-white: #202528;
-    --color-dark: #edeffd;
+    --color-dark: #edeffdbe;
     --color-dark-variant: #a3bdcc;
     --color-light: rgba(0, 0, 0, 0.4);
     --box-shadow: 0 2rem 3rem var(--color-light)
@@ -610,4 +610,84 @@ h3 .user-manager-cards-title {
 .user-manager-container h3 a:hover {
     color: var(--color-danger);
     text-decoration: underline;
+}
+
+.user-manager-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    padding: 0 2rem 0 0 ;
+}
+
+.user-manager-cards-container .user-manager-cards {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-left: 0.5rem;
+}
+
+.user-manager-container .user-manager-cards-container .user-manager-card {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.5rem;
+    flex: 1 1 calc(25% - 2rem); 
+    box-sizing: border-box; 
+    border-radius: var(--border-radius-1);
+    padding: 2rem;
+    background-color: var(--color-white);
+    box-shadow: var(--box-shadow);
+    transition: 0.7s ease all;
+}
+
+.user-manager-container .user-manager-cards-container .user-manager-card:hover {
+    box-shadow: none;
+}
+
+.user-manager-container .user-manager-cards-container .user-manager-card h2 {
+    font-size: 1.4rem;
+}
+
+.user-manager-container .user-manager-cards-container .user-manager-card p {
+    font-size: 0.72rem;
+}
+
+.user-manager-container .user-manager-cards-container .user-manager-card .manager-statics {
+    margin-top: 4rem;
+    margin-bottom: 4rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.user-manager-container .user-manager-cards-container .user-manager-card .manager-statics .numbers-statics {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.user-manager-container .user-manager-cards-container .user-manager-card .manager-statics .numbers-statics .number-of-users {
+    font-size: 3rem;
+}
+
+.user-manager-container .user-manager-cards-container .user-manager-card .manager-statics .numbers-statics .new-users-in-30-days {
+    color: var(--color-success);
+    font-size: 1rem;
+}
+
+.user-manager-container .user-manager-cards-container .user-manager-card .manager-statics a {
+    display: flex;
+    background-color: var(--color-light);
+    padding: 0.5rem 2rem;
+    border-radius: var(--border-radius-1);
+    color: var(--color-dark-variant);
+    transition: all 0.7s ease;
+}
+
+.user-manager-container .user-manager-cards-container .user-manager-card .manager-statics a:hover {
+    background-color: var(--color-dark-variant);
+    color: var(--color-danger);
 }

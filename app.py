@@ -2,7 +2,7 @@ from flask import *
 from flask_login import *
 import os
 from flask_sqlalchemy import *
-from datetime import datetime 
+from datetime import *
 import base64
 import smtplib
 from email.message import EmailMessage
@@ -249,7 +249,21 @@ def user_manager():
         pass
     else:
         user = current_user if current_user.is_authenticated else None
-        return render_template("users_manager.html", user=user)
+
+        last_user = User.query.order_by(User.id.desc()).first()
+        last_user_id = last_user.id if last_user else 0
+
+        thirty_days_ago = datetime.now() - timedelta(days=30)
+
+        new_users_count = 0
+        
+        all_users = User.query.all()
+        for u in all_users:
+            user_create_date = datetime.strptime(u.create_date, '%d/%m/%Y %H:%M')
+            if user_create_date >= thirty_days_ago:
+                new_users_count += 1
+
+        return render_template("users_manager.html", user=user, last_user_id=last_user_id, new_users_count=new_users_count)
 
 def create_user():
     user = User(username="admin",
