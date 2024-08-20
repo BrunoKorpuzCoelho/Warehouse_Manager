@@ -1,8 +1,0 @@
-1-  AC
-
-Criar uma interface por section do warehouse para contolar a temperatura de forma automatica dependendo da temperatura exterior e pudendo ser configurada pelo manager
-Criar uma forma de verificar todas as temperaturas das arcas frigorificas e dos locais que tem de estar quentes
-
-2- ROLES
-
-Criar uma tabela com varios tipos de cargos dentro da empresa em que cada cargo seja correspondente a varios tipos de permissoes, e cada user tenha o seu cargo que é passado por correlacao para a tabela ROLES 
