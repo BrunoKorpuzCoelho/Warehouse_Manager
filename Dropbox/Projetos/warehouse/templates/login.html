@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login  |  Cubix</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <style>
+        body {
+            background-image: url('/static/img/blackandwhitee.png'); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Section -->
+    <main>
+        <div class="login-container">
+            <div class="form-title">
+                <h1>Wellcome back</h1>
+                <h2>Enter your email and password to sign in.</h2>
+            </div>
+
+            {% if error %}
+            <div class="error-message">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <!-- Login Form -->
+            <form action="/login" method="POST">
+                <label for="username">Username</label>
+                <input type="text" placeholder="Cubix" name="username" required>
+
+                <label for="password">Password</label>
+                <input type="password" placeholder="*********" name="password" required>
+
+                <a href="" class="forgot-password">Forgot password?</a>  <!-- Colocar aqui o link para a pagina de recuperação da palavra passe -->
+
+                <button type="submit" class="login-btn">Sign In</button>
+
+            </form>
+
+            <div class="login-extra-btns">
+                <a href="" class="login-home-btn">Home</a> <!-- Colocar aqui o link para a pagina home -->
+                <a href="" class="login-singup-btn">Sign Up</a> <!-- Colocar aqui o link para a pagina de criar conta -->
+            </div>
+        </div>
+    </main>
+    <!-- End of Main Section -->
+</body>
+</html>
