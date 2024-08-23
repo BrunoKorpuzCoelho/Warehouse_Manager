@@ -13,6 +13,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
+            min-height: auto;
         }
     </style>
 </head>
@@ -98,7 +99,7 @@
                                 <h2 class="number-of-users">{{ last_user_id }}</h2>
                                 <p class="new-users-in-30-days">+{{ new_users_count }}</p>
                             </div>
-                            <a href="">New User</a>
+                            <a href="" id="new-user-link">New User</a>
                         </div>
 
                         <p class="users-card-final-p">Active users in the last 30 days</p>
@@ -110,8 +111,8 @@
                         
                         <div class="manager-statics">
                             <div class="numbers-statics">
-                                <h2 class="number-of-users deactivated">{{ last_user_id }}</h2>
-                                <p class="new-users-in-30-days deactivated">+{{ new_users_count }}</p>
+                                <h2 class="number-of-users deactivated">{{ deactivated_users_count }}</h2>
+                                <p class="new-users-in-30-days deactivated">+{{ deactivated_users_recent_count }}</p>
                             </div>
                             <a href="">Reactivate</a>
                         </div>
@@ -124,8 +125,10 @@
                         <p>Manage user permissions and roles.</p>
 
                         <div class="manager-statics">
-                            <p class="number-of-users"></p>
-                            <p class="new-users-in-30-days"></p>
+                            <div class="numbers-statics">
+                                <h2 class="number-of-users">{{ total_permissions }}</h2>
+                                <p class="new-users-in-30-days">/12</p>
+                            </div>
                             <a href="">Add Permission</a>
                         </div>
 
@@ -137,12 +140,52 @@
                         <p>Configure user management settings.</p>
                         
                         <div class="manager-statics">
-                            <p class="number-of-users"></p>
-                            <p class="new-users-in-30-days"></p>
+                            <div class="numbers-statics">
+                                <h2 class="number-of-users">10</h2>
+                            </div>
                             <a href="">Manage Settings</a>
                         </div>
 
                         <p class="users-card-final-p">User management settings configured</p>
+                    </div>
+                </div>
+
+                <div class="users-details">
+                    <h2>Users</h2>
+                    <p>View and manage your application users.</p>
+                    <div class="user-detail-list">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            {% for user in all_users[:3] %}
+                            <tbody>
+                                <tr>
+                                    <td class="user-name-table">
+                                        <span class="material-symbols-outlined person">person</span>
+                                        <div class="table-user-name">
+                                            {{ user.name }}
+                                            <p>Number: {{ user.id }}</p>
+                                        </div>
+                                    </td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.role }}</td>
+                                    <td>{{ user.status }}</td>
+                                    <td>
+                                        <a href="/edit/{{ user.id }}">Edit</a> | 
+                                        <a href="/delete/{{ user.id }}" onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        <a href="" class="show-more">Show More</a>
                     </div>
                 </div>
             </div>

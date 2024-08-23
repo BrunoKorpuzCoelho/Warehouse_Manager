@@ -407,10 +407,17 @@ b {
 }
 
 .header-dashboard {
-    width: 100%;
-    position: absolute;
+    width:50%;
+    position: fixed;
     top: 0;
-    padding: 30px 40px;
+    right: 0;
+    padding: 10px 40px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.header-hidden {
+    transform: translateY(-100%); 
+    transition: transform 0.3s ease-in-out;
 }
 
 .dashboard-nav {
@@ -465,6 +472,8 @@ b {
 .user-manager-container {
     display: flex;
     width: 100vw;
+    max-height: 100vh;
+    margin-top: 1rem;
     flex-direction: row;
     gap: 3rem;
     padding: var(--padding-1);
@@ -475,8 +484,8 @@ b {
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    height: 75vh;
     width: 85px; 
+    min-height: 75vh;
     text-align: center;
     padding: 0.3rem;
     background-color: var(--color-white);
@@ -690,4 +699,255 @@ h3 .user-manager-cards-title {
 .user-manager-container .user-manager-cards-container .user-manager-card .manager-statics a:hover {
     background-color: var(--color-dark-variant);
     color: var(--color-danger);
+}
+
+.user-manager-cards-container .users-details {
+    margin-left: 0.5rem;
+    margin-top: 2rem;
+    padding: var(--padding-1);
+    width: 100%;
+    background-color: var(--color-white);
+    border-radius: var(--border-radius-1);
+    box-shadow: var(--box-shadow);
+    transition: 0.7s all ease;
+}
+
+.user-manager-cards-container .users-details p {
+    margin-top: 0.3rem;
+    font-size: 0.8rem;
+}
+
+.user-manager-cards-container .users-details:hover {
+    box-shadow: none;
+}
+
+.user-detail-list {
+    margin-top: 1.5rem;
+    width: 100%;
+}
+
+.user-detail-list table {
+    width: 100%;
+    border-collapse: collapse;
+    max-width: 100%;
+    table-layout: fixed;
+    word-wrap: break-word
+}
+
+.user-name-table {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.user-name-table .table-user-name p {
+    font-size: 0.72rem;
+}
+
+.user-detail-list th, .user-detail-list td {
+    padding: 17px 15px;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-detail-list td {
+    font-size: 0.9rem;
+}
+
+.user-detail-list td .person {
+    vertical-align: middle;
+    margin-right: 0.3rem;
+}
+
+.user-detail-list thead {
+    color: var(--color-danger);
+    border-bottom: 1px solid #ddd;
+}
+
+.user-detail-list tbody tr:hover {
+    opacity: 0.5;
+}
+
+.user-detail-list th {
+    font-weight: bold;
+}
+
+.user-detail-list .show-more {
+    display: flex;
+    margin-top: 1rem;
+    font-size: 0.87rem;
+    justify-content: center;
+    opacity: 0.3;
+    transition: all 0.3s ease;
+}
+
+.user-detail-list .show-more:hover {
+    opacity: 1;
+}
+
+.manager-new-registration {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    text-align: center;
+}
+
+.manager-new-registration h2 {
+    color: var(--color-danger);
+    font-size: 1.6rem;
+}
+
+.manager-new-registration p {
+    font-size: 0.9rem;
+}
+
+.manager-new-registration .manager-new-registration-inner {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 3rem;
+    justify-content: center;
+    margin-top: 2rem;
+    padding: var(--padding-1);
+}
+
+.manager-new-registration-inner form {
+    display: flex;
+    width: 100%;
+    gap: 3rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.new-register-user-form {
+    width: calc(45% - 1rem);
+    padding: var(--card-padding);
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    border-radius: var(--border-radius-2);
+    box-shadow: var(--box-shadow);
+    transition: 0.7s all ease;
+}
+
+.new-register-user-form:hover,
+.new-register-permission-form:hover {
+    box-shadow: none;
+}
+
+.new-register-permission-form {
+    width: calc(45% - 1rem);
+    padding: var(--card-padding);
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    border-radius: var(--border-radius-2);
+    box-shadow: var(--box-shadow);
+    transition: 0.7s all ease;
+}
+
+.new-register-user-form .manager-new-registration-input {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    justify-content: center;
+}
+
+.new-register-user-form .manager-new-registration-input label,
+.new-register-user-form .manager-new-registration-input input[type="text"],
+.new-register-user-form .manager-new-registration-input input[type="email"],
+.new-register-user-form .manager-new-registration-input input[type="password"]{
+    width: 100%;
+}
+
+.manager-new-registration-label-input {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+.new-register-user-form .manager-new-registration-input input {
+    padding: 0.9rem 1rem;
+    border-radius: var(--border-radius-1);
+    background-color: transparent;
+    border: solid 1px var(--color-dark);
+    text-align: center;
+    color: var(--color-info-dark);
+}
+
+.new-register-user-form select {
+    padding: 0.9rem 1rem; 
+    border-radius: var(--border-radius-1); 
+    background-color: transparent; 
+    border: solid 1px var(--color-dark); 
+    text-align: center;
+    width: 100%; 
+    font-family: inherit; 
+    font-size: inherit; 
+    color: var(--color-dark);
+    cursor: pointer; 
+}
+
+.new-register-user-form select:focus {
+    outline: none; 
+    border-color: var(--color-danger); 
+}
+
+.new-register-user-form .manager-new-registration-label-input {
+    position: relative;
+}
+
+.new-register-user-form select option {
+    background-color: var(--color-background); 
+    color: var(--color-dark);
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+.new-register-user-form select option:checked {
+    background-color: var(--color-danger); 
+    color: #FFF; 
+}
+
+.new-register-permission-checkbox {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.container-checkbox {
+    cursor: pointer;
+    vertical-align: middle;
+}
+  
+.container-checkbox input {
+    display: none;
+}
+  
+.container-checkbox svg {
+    overflow: visible;
+}
+
+.path {
+    fill: none;
+    stroke: var(--color-success);
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke-dasharray 0.5s ease, stroke-dashoffset 0.5s ease;
+    stroke-dasharray: 241 9999999;
+    stroke-dashoffset: 0;
+}
+  
+.container-checkbox input:checked ~ svg .path {
+    stroke-dasharray: 70.5096664428711 9999999;
+    stroke-dashoffset: -262.2723388671875;
 }
