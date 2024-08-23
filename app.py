@@ -7,6 +7,7 @@ import base64
 import smtplib
 from email.message import EmailMessage
 from sqlalchemy.orm import validates
+import random
 
 # App config
 app = Flask(__name__)
@@ -28,11 +29,14 @@ class User(db.Model, UserMixin):
     create_date = db.Column(db.String(20))
     last_login = db.Column(db.String(20))
     status = db.Column(db.String(20), default="Active")
+    role = db.Column(db.String(40))
     user_type = db.Column(db.String(50), default="Client")
+    pin = db.Column(db.Integer, unique=True)
 
     product_movements = db.relationship('ProductMovements', back_populates='user', lazy=True)
+    permissions = db.relationship("UserPermissions", uselist=False, back_populates="user")
 
-    def __init__(self, username, password, nif, email, name, cellphone, last_login=None, status="Active", user_type="Client"):
+    def __init__(self, username, password, nif, email, name, cellphone, role=None, last_login=None, status="Active", user_type="Client"):
         self.username = username
         self.password = password
         self.nif = nif
@@ -42,7 +46,26 @@ class User(db.Model, UserMixin):
         self.create_date = datetime.now().strftime('%d/%m/%Y %H:%M')
         self.last_login = last_login
         self.status = status.capitalize()
+        self.role = role
         self.user_type = user_type.capitalize()
+        self.pin = random.randint(10000, 99999)
+
+class UserPermissions(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True, nullable=False)
+    can_view_dashboard = db.Column(db.Boolean, default=True)
+    can_edit_users = db.Column(db.Boolean, default=False)
+    can_manage_inventory = db.Column(db.Boolean, default=False)
+    can_view_reports = db.Column(db.Boolean, default=True)
+
+    user = db.relationship('User', back_populates='permissions')
+
+    def __init__(self, user_id, can_view_dashboard=True, can_edit_users=False, can_manage_inventory=False, can_view_reports=True):
+        self.user_id = user_id
+        self.can_view_dashboard = can_view_dashboard
+        self.can_edit_users = can_edit_users
+        self.can_manage_inventory = can_manage_inventory
+        self.can_view_reports = can_view_reports
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -254,8 +277,11 @@ def user_manager():
         last_user_id = last_user.id if last_user else 0
 
         thirty_days_ago = datetime.now() - timedelta(days=30)
+        ninety_days_ago = datetime.now() - timedelta(days=90)
 
         new_users_count = 0
+        deactivated_users_count = 0
+        deactivated_users_recent_count = 0
         
         all_users = User.query.all()
         for u in all_users:
@@ -263,16 +289,31 @@ def user_manager():
             if user_create_date >= thirty_days_ago:
                 new_users_count += 1
 
-        return render_template("users_manager.html", user=user, last_user_id=last_user_id, new_users_count=new_users_count)
+            if u.status == 'Deactive':
+                deactivated_users_count += 1
+                if user_create_date >= ninety_days_ago:
+                    deactivated_users_recent_count += 1
+        
+        total_permissions = 0
+        if user and user.permissions:
+            permissions = user.permissions
+            total_permissions = sum([
+                permissions.can_view_dashboard,
+                permissions.can_edit_users,
+                permissions.can_manage_inventory,
+                permissions.can_view_reports
+            ])
+
+        return render_template("users_manager.html", user=user, last_user_id=last_user_id, new_users_count=new_users_count, deactivated_users_count=deactivated_users_count, deactivated_users_recent_count=deactivated_users_recent_count, total_permissions=total_permissions, all_users=all_users)
 
 def create_user():
-    user = User(username="admin",
-                password="admin",
-                user_type="Admin",
-                nif = "999999999",
-                email = "test@example.com",
-                name = "Bruno Coelho",
-                cellphone = "111111111"
+    user = User(username="test",
+                password="teste",
+                user_type="Employee",
+                nif = "784512547",
+                email = "employee@example.com",
+                name = "Darlin Vieira",
+                cellphone = "941124478"
                 )
     db.session.add(user)
     db.session.commit()
