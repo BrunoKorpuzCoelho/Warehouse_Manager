@@ -850,6 +850,12 @@ h3 .user-manager-cards-title {
     transition: 0.7s all ease;
 }
 
+.new-register-permission-form h3 {
+    color: var(--color-danger);
+    text-align: left;
+    font-size: 1.4rem;
+}
+
 .new-register-user-form .manager-new-registration-input {
     display: flex;
     flex-direction: row;
@@ -917,10 +923,16 @@ h3 .user-manager-cards-title {
 .new-register-permission-checkbox {
     display: flex;
     flex-direction: row;
-    gap: 1rem;
+    flex: 1;
+    gap: 3rem;
     width: 100%;
     justify-content: center;
     margin-bottom: 10px;
+}
+
+.permission-checkbox {
+    display: flex;
+    width: 100%;
 }
 
 .container-checkbox {
@@ -950,4 +962,24 @@ h3 .user-manager-cards-title {
 .container-checkbox input:checked ~ svg .path {
     stroke-dasharray: 70.5096664428711 9999999;
     stroke-dashoffset: -262.2723388671875;
+}
+
+.manager-new-registration form button {
+    width:10%;
+    padding: 1rem;
+    border: none;
+    border-radius: var(--border-radius-1);
+    background-color: var(--color-danger);
+    color:var(--color-dark);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.7s ease all;
+    margin-top: 2rem;
+}
+
+.manager-new-registration form button:hover {
+    background-color: var(--color-dark);
+    color: var(--color-danger);
+    border-radius: var(--border-radius-2);
+    box-shadow: var(--box-shadow);
 }

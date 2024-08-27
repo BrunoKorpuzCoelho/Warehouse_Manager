@@ -76,7 +76,7 @@
         <div class="user-manager-container">
             <div class="side-menu">
                 <a href="/dashboard" title="Dashboard"><span class="material-symbols-outlined home">widgets</span></a>
-                <a href="" class="active active-users" title="Users Management"><span class="material-symbols-outlined users">account_circle</span></a>
+                <a href="users-manager" class="active active-users" title="Users Management"><span class="material-symbols-outlined users">account_circle</span></a>
                 <a href=""><span class="material-symbols-outlined warehouse">warehouse</span></a>
                 <a href=""><span class="material-symbols-outlined inventory">inventory_2</span></a>
                 <a href=""><span class="material-symbols-outlined shipping">local_shipping</span></a>
@@ -90,7 +90,7 @@
                 <h2>Register</h2>
                 <p>Create a new account</p>
 
-                <form action="" method="POST">
+                <form action="/manager-new-user" method="POST">
                     <div class="manager-new-registration-inner">
                         <div class="new-register-user-form">
                             <div class="manager-new-registration-input">
@@ -172,130 +172,130 @@
                         </div>
                 
                         <div class="new-register-permission-form">
-                            <h3>Permissions</h3>
+                            <h3>Permissions:</h3>
                             <div class="new-register-permission-checkbox">
                                 <div class="permission-checkbox">
                                     <label class="container-checkbox">
-                                    <input type="checkbox">
+                                    <input type="checkbox" name="can_create_new_users">
                                     <svg viewBox="0 0 64 64" height="1rem" width="2rem">
                                         <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
                                     </svg>
                                     </label>
-                                    <label for="perm1">Permission 1</label>
+                                    <label for="can_create_new_users">Create and edit Users</label>
                                 </div>
                                 <div class="permission-checkbox">
                                     <label class="container-checkbox">
-                                        <input type="checkbox">
+                                        <input type="checkbox" name="can_active_users">
                                         <svg viewBox="0 0 64 64" height="1rem" width="2rem">
                                             <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
                                         </svg>
                                         </label>
-                                    <label for="perm2">Permission 2</label>
+                                    <label for="can_active_users">Active/Deactive Users</label>
                                 </div>
                             </div>
 
                             <div class="new-register-permission-checkbox">
                                 <div class="permission-checkbox">
                                     <label class="container-checkbox">
-                                    <input type="checkbox">
+                                    <input type="checkbox" name="can_adjust_inventory_differences">
                                     <svg viewBox="0 0 64 64" height="1rem" width="2rem">
                                         <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
                                     </svg>
                                     </label>
-                                    <label for="perm1">Permission 1</label>
+                                    <label for="can_adjust_inventory_differences">Adjust Inventory Differences</label>
                                 </div>
                                 <div class="permission-checkbox">
                                     <label class="container-checkbox">
-                                        <input type="checkbox">
+                                        <input type="checkbox" name="can_manage_suppliers">
                                         <svg viewBox="0 0 64 64" height="1rem" width="2rem">
                                             <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
                                         </svg>
                                         </label>
-                                    <label for="perm2">Permission 2</label>
+                                    <label for="can_manage_suppliers">Manage Suppliers</label>
                                 </div>
                             </div>
 
                             <div class="new-register-permission-checkbox">
                                 <div class="permission-checkbox">
                                     <label class="container-checkbox">
-                                    <input type="checkbox">
+                                    <input type="checkbox" name="can_view_temperature_logs">
                                     <svg viewBox="0 0 64 64" height="1rem" width="2rem">
                                         <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
                                     </svg>
                                     </label>
-                                    <label for="perm1">Permission 1</label>
+                                    <label for="can_view_temperature_logs">View Temperature Logs</label>
                                 </div>
                                 <div class="permission-checkbox">
                                     <label class="container-checkbox">
-                                        <input type="checkbox">
+                                        <input type="checkbox" name="can_adjust_temperature_discrepancies">
                                         <svg viewBox="0 0 64 64" height="1rem" width="2rem">
                                             <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
                                         </svg>
                                         </label>
-                                    <label for="perm2">Permission 2</label>
+                                    <label for="can_adjust_temperature_discrepancies">Adjust Temperature Discrepancies</label>
                                 </div>
                             </div>
 
                             <div class="new-register-permission-checkbox">
                                 <div class="permission-checkbox">
                                     <label class="container-checkbox">
-                                    <input type="checkbox">
+                                    <input type="checkbox" name="can_access_high_security_areas">
                                     <svg viewBox="0 0 64 64" height="1rem" width="2rem">
                                         <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
                                     </svg>
                                     </label>
-                                    <label for="perm1">Permission 1</label>
+                                    <label for="can_access_high_security_areas">Access High Security Areas</label>
                                 </div>
                                 <div class="permission-checkbox">
                                     <label class="container-checkbox">
-                                        <input type="checkbox">
+                                        <input type="checkbox" name="can_generate_financial_reports">
                                         <svg viewBox="0 0 64 64" height="1rem" width="2rem">
                                             <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
                                         </svg>
                                         </label>
-                                    <label for="perm2">Permission 2</label>
+                                    <label for="can_generate_financial_reports">Generate Financial Reports</label>
                                 </div>
                             </div>
 
                             <div class="new-register-permission-checkbox">
                                 <div class="permission-checkbox">
                                     <label class="container-checkbox">
-                                    <input type="checkbox">
+                                    <input type="checkbox" name="can_manage_user_permissions">
                                     <svg viewBox="0 0 64 64" height="1rem" width="2rem">
                                         <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
                                     </svg>
                                     </label>
-                                    <label for="perm1">Permission 1</label>
+                                    <label for="can_manage_user_permissions">Manage User Permissions</label>
                                 </div>
                                 <div class="permission-checkbox">
                                     <label class="container-checkbox">
-                                        <input type="checkbox">
+                                        <input type="checkbox" name="can_view_audit_logs">
                                         <svg viewBox="0 0 64 64" height="1rem" width="2rem">
                                             <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
                                         </svg>
                                         </label>
-                                    <label for="perm2">Permission 2</label>
+                                    <label for="can_view_audit_logs">View Audit Logs</label>
                                 </div>
                             </div>
 
                             <div class="new-register-permission-checkbox">
                                 <div class="permission-checkbox">
                                     <label class="container-checkbox">
-                                    <input type="checkbox">
+                                    <input type="checkbox" name="can_override_automatic_system_flags">
                                     <svg viewBox="0 0 64 64" height="1rem" width="2rem">
                                         <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
                                     </svg>
                                     </label>
-                                    <label for="perm1">Permission 1</label>
+                                    <label for="can_override_automatic_system_flags">Override Automatic System Flags</label>
                                 </div>
                                 <div class="permission-checkbox">
                                     <label class="container-checkbox">
-                                        <input type="checkbox">
+                                        <input type="checkbox" name="can_manage_orders">
                                         <svg viewBox="0 0 64 64" height="1rem" width="2rem">
                                             <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
                                         </svg>
                                         </label>
-                                    <label for="perm2">Permission 2</label>
+                                    <label for="can_manage_orders">Manage Orders</label>
                                 </div>
                             </div>
                         </div>

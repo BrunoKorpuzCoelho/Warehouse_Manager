@@ -76,7 +76,7 @@
         <div class="user-manager-container">
             <div class="side-menu">
                 <a href="/dashboard" title="Dashboard"><span class="material-symbols-outlined home">widgets</span></a>
-                <a href="" class="active active-users" title="Users Management"><span class="material-symbols-outlined users">account_circle</span></a>
+                <a href="/users-manager" class="active active-users" title="Users Management"><span class="material-symbols-outlined users">account_circle</span></a>
                 <a href=""><span class="material-symbols-outlined warehouse">warehouse</span></a>
                 <a href=""><span class="material-symbols-outlined inventory">inventory_2</span></a>
                 <a href=""><span class="material-symbols-outlined shipping">local_shipping</span></a>
@@ -99,7 +99,9 @@
                                 <h2 class="number-of-users">{{ last_user_id }}</h2>
                                 <p class="new-users-in-30-days">+{{ new_users_count }}</p>
                             </div>
-                            <a href="" id="new-user-link">New User</a>
+                            {% if user.user_type == "Admin" or user.user_type == "Manager" %}
+                                <a href="/manager-new-user">New User</a>
+                            {% endif %}
                         </div>
 
                         <p class="users-card-final-p">Active users in the last 30 days</p>
@@ -114,7 +116,9 @@
                                 <h2 class="number-of-users deactivated">{{ deactivated_users_count }}</h2>
                                 <p class="new-users-in-30-days deactivated">+{{ deactivated_users_recent_count }}</p>
                             </div>
-                            <a href="">Reactivate</a>
+                            {% if user.user_type == "Admin" or user.user_type == "Manager" %}
+                                <a href="">Reactivate</a>
+                            {% endif %}
                         </div>
 
                         <p class="users-card-final-p">Users deactivated in the last 90 days</p>
@@ -129,7 +133,9 @@
                                 <h2 class="number-of-users">{{ total_permissions }}</h2>
                                 <p class="new-users-in-30-days">/12</p>
                             </div>
-                            <a href="">Add Permission</a>
+                            {% if user.user_type == "Admin" or user.user_type == "Manager" %}
+                                <a href="">Add Permission</a>
+                            {% endif %}
                         </div>
 
                         <p class="users-card-final-p">Active permissions in the system</p>
@@ -143,7 +149,9 @@
                             <div class="numbers-statics">
                                 <h2 class="number-of-users">10</h2>
                             </div>
+                            {% if user.user_type == "Admin" or user.user_type == "Manager" %}
                             <a href="">Manage Settings</a>
+                            {% endif %}
                         </div>
 
                         <p class="users-card-final-p">User management settings configured</p>

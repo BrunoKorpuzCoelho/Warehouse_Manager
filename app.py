@@ -53,19 +53,35 @@ class User(db.Model, UserMixin):
 class UserPermissions(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True, nullable=False)
-    can_view_dashboard = db.Column(db.Boolean, default=True)
-    can_edit_users = db.Column(db.Boolean, default=False)
-    can_manage_inventory = db.Column(db.Boolean, default=False)
-    can_view_reports = db.Column(db.Boolean, default=True)
+    can_adjust_inventory_differences = db.Column(db.Boolean, default=False)
+    can_manage_suppliers = db.Column(db.Boolean, default=False)
+    can_view_temperature_logs = db.Column(db.Boolean, default=False)
+    can_adjust_temperature_discrepancies = db.Column(db.Boolean, default=False)
+    can_access_high_security_areas = db.Column(db.Boolean, default=False)
+    can_generate_financial_reports = db.Column(db.Boolean, default=False)
+    can_manage_user_permissions = db.Column(db.Boolean, default=False)
+    can_view_audit_logs = db.Column(db.Boolean, default=False)
+    can_override_automatic_system_flags = db.Column(db.Boolean, default=False)
+    can_manage_orders = db.Column(db.Boolean, default=False)
+    can_create_new_users = db.Column(db.Boolean, default=False)
+    can_active_users = db.Column(db.Boolean, default=False)
 
     user = db.relationship('User', back_populates='permissions')
 
-    def __init__(self, user_id, can_view_dashboard=True, can_edit_users=False, can_manage_inventory=False, can_view_reports=True):
+    def __init__(self, user_id, can_adjust_inventory_differences=False, can_manage_suppliers=False, can_view_temperature_logs=False, can_adjust_temperature_discrepancies=False,can_access_high_security_areas=False, can_generate_financial_reports=False, can_manage_user_permissions=False, can_view_audit_logs=False, can_override_automatic_system_flags=False, can_manage_orders=False, can_create_new_users=False, can_active_users=False):
         self.user_id = user_id
-        self.can_view_dashboard = can_view_dashboard
-        self.can_edit_users = can_edit_users
-        self.can_manage_inventory = can_manage_inventory
-        self.can_view_reports = can_view_reports
+        self.can_adjust_inventory_differences = can_adjust_inventory_differences
+        self.can_manage_suppliers = can_manage_suppliers
+        self.can_view_temperature_logs = can_view_temperature_logs
+        self.can_adjust_temperature_discrepancies = can_adjust_temperature_discrepancies
+        self.can_access_high_security_areas = can_access_high_security_areas
+        self.can_generate_financial_reports = can_generate_financial_reports
+        self.can_manage_user_permissions = can_manage_user_permissions
+        self.can_view_audit_logs = can_view_audit_logs
+        self.can_override_automatic_system_flags = can_override_automatic_system_flags
+        self.can_manage_orders = can_manage_orders
+        self.can_create_new_users = can_create_new_users
+        self.can_active_users = can_active_users
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -266,7 +282,7 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route("/users-manager", methods=["GET", "POST"])
-# @login_required
+@login_required
 def user_manager():
     if request.method == "POST":
         pass
@@ -298,13 +314,88 @@ def user_manager():
         if user and user.permissions:
             permissions = user.permissions
             total_permissions = sum([
-                permissions.can_view_dashboard,
-                permissions.can_edit_users,
-                permissions.can_manage_inventory,
-                permissions.can_view_reports
+                permissions.can_adjust_inventory_differences,
+                permissions.can_manage_suppliers,
+                permissions.can_view_temperature_logs,
+                permissions.can_adjust_temperature_discrepancies,
+                permissions.can_access_high_security_areas,
+                permissions.can_generate_financial_reports,
+                permissions.can_manage_user_permissions,
+                permissions.can_view_audit_logs,
+                permissions.can_override_automatic_system_flags,
+                permissions.can_manage_orders,
+                permissions.can_create_new_users,
+                permissions.can_active_users
             ])
 
         return render_template("users_manager.html", user=user, last_user_id=last_user_id, new_users_count=new_users_count, deactivated_users_count=deactivated_users_count, deactivated_users_recent_count=deactivated_users_recent_count, total_permissions=total_permissions, all_users=all_users)
+    
+@app.route("/manager-new-user", methods=["GET", "POST"])
+@login_required
+def manager_new_user():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        name = request.form["name"]
+        nif = request.form["nif"]
+        cellphone = request.form["cellphone"]
+        email = request.form["email"]
+        role = request.form["role"]
+        user_type = request.form["user_type"]
+
+        can_create_new_users = 'can_create_new_users' in request.form
+        can_active_users = 'can_active_users' in request.form
+        can_adjust_inventory_differences = 'can_adjust_inventory_differences' in request.form
+        can_manage_suppliers = 'can_manage_suppliers' in request.form
+        can_view_temperature_logs = 'can_view_temperature_logs' in request.form
+        can_adjust_temperature_discrepancies = 'can_adjust_temperature_discrepancies' in request.form
+        can_access_high_security_areas = 'can_access_high_security_areas' in request.form
+        can_generate_financial_reports = 'can_generate_financial_reports' in request.form
+        can_manage_user_permissions = 'can_manage_user_permissions' in request.form
+        can_view_audit_logs = 'can_view_audit_logs' in request.form
+        can_override_automatic_system_flags = 'can_override_automatic_system_flags' in request.form
+        can_manage_orders = 'can_manage_orders' in request.form
+
+        new_user = User (
+            username = username,
+            password = password,
+            name = name,
+            nif = nif,
+            cellphone = cellphone,
+            email = email,
+            role = role,
+            user_type = user_type,
+        )
+
+        db.session.add(new_user)
+        db.session.commit()
+        print("The user has been successfully created.")
+
+        new_user_permissions = UserPermissions(
+            user_id=new_user.id,
+            can_create_new_users = can_create_new_users,
+            can_active_users = can_active_users,
+            can_adjust_inventory_differences = can_adjust_inventory_differences,
+            can_manage_suppliers = can_manage_suppliers,
+            can_view_temperature_logs = can_view_temperature_logs,
+            can_adjust_temperature_discrepancies = can_adjust_temperature_discrepancies,
+            can_access_high_security_areas = can_access_high_security_areas,
+            can_generate_financial_reports = can_generate_financial_reports,
+            can_manage_user_permissions = can_manage_user_permissions,
+            can_view_audit_logs = can_view_audit_logs,
+            can_override_automatic_system_flags = can_override_automatic_system_flags,
+            can_manage_orders = can_manage_orders
+        )
+
+        db.session.add(new_user_permissions)
+        print("Permissions have been successfully added.")
+        db.session.commit()
+
+        return redirect(url_for("user_manager"))
+
+    else:
+        user = current_user if current_user.is_authenticated else None
+        return render_template("manager_new_user_register.html",  user=user)
 
 def create_user():
     user = User(username="test",

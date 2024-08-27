@@ -32,15 +32,3 @@ const toggle = document.getElementById('darkModeToggle');
         lastScrollTop = scrollTop;
     });
 });
-
-var userType = "{{ user.user_type }}";
-
-document.getElementById("new-user-link").addEventListener("click", function(event) {
-    event.preventDefault();
-
-    if (userType === "Admin" || userType === "Manager") {
-        window.location.href = "";   // COLOCAR AQUI O LINK PARA A PAGINA DE CRIACAO DE USUARIOS
-    } else {
-        window.location.href = "";  //COLOCAR AQUI O LINK PARA A PAGINA DE SEM PERMISSAO PARA ACESSAR A PAGINA
-    }
-});
