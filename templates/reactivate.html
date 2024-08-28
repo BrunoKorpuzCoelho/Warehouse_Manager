@@ -1,11 +1,92 @@
+<!-- LINKS POR COLOCAR -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Reactivate Users |  Cubix</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/darkMode.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            min-height: auto;
+        }
+    </style>
 </head>
-<body>
-    
+<body id="body">
+    <!-- Form for Logout -->
+    <form id="logout-form" action="{{ url_for('logout') }}" method="post" style="display: none;">
+        <input type="hidden" name="logout" value="true">
+    </form>
+    <!-- End of Form for Logout -->
+
+    <!-- Main Menu -->
+     <main>
+        <div class="user-manager-container">
+            <div class="side-menu">
+                <a href="/dashboard" title="Dashboard"><span class="material-symbols-outlined home">widgets</span></a>
+                <a href="/users-manager" class="active active-users" title="Users Management"><span class="material-symbols-outlined users">account_circle</span></a>
+                <a href="" title="Warehouse"><span class="material-symbols-outlined warehouse">warehouse</span></a>
+                <a href="" title="Stock"><span class="material-symbols-outlined inventory">inventory_2</span></a>
+                <a href="" title="Shipping"><span class="material-symbols-outlined shipping">local_shipping</span></a>
+                <a href="" title="Orders"><span class="material-symbols-outlined order">package_2</span></a>
+                <a href="" title="Climate Controls"><span class="material-symbols-outlined ac">ac_unit</span></a>
+                <a href="" title="Payments"><span class="material-symbols-outlined payments">payments</span></a>
+                <a href="" title="Settings"><span class="material-symbols-outlined settings">manufacturing</span></a>
+                <a href="#" onclick="document.getElementById('logout-form').submit();" title="Logout"><span class="material-symbols-outlined users">logout</span></a>
+            </div>
+
+            <div class="reactivate-users-container">
+                <div class="reactivate-users-container-header">
+                    <h3><a href="/dashboard">Dashboard </a><span class="user-manager-cards-title">></span><a href="/users-manager"> User Management </a><span class="user-manager-cards-title">></span><span class="user-manager-cards-title">Reactivate User</span></h3>
+                </div>
+
+                <div class="reactivate-users-filters">
+                    <div class="input-search-user-container"> 
+                        <input type="text" id="filter-users" placeholder="Search for users...">
+                        <button type="submit"><span class="material-symbols-outlined">search</span></button>
+                    </div>
+                </div>
+
+                <div class="reactivate-users-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        {% for user in all_users %}
+                        <tbody>
+                            <tr>
+                                <td class="reactivate-user-table">
+                                    <div class="table-reactivate-user-name">
+                                        {{ user.name }}
+                                        <p>Number: {{ user.id }}</p>
+                                    </div>
+                                </td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.role }}</td>
+                                <td>{{ user.status }}</td>
+                                <td>
+                                    
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+     </main>
+     <script src="/static/js/main.js"></script>
 </body>
 </html>

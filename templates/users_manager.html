@@ -18,72 +18,26 @@
     </style>
 </head>
 <body id="body">
-    <header class="header-dashboard">
-        <nav class="dashboard-nav">
-            <div class="user-info">
-                {% if user %}
-                    <p> {{ user.name }}</p>
-                {% else %}
-                    <p>None</p>
-                {% endif %}
-            </div>
+    <!-- Form for Logout -->
+    <form id="logout-form" action="{{ url_for('logout') }}" method="post" style="display: none;">
+        <input type="hidden" name="logout" value="true">
+    </form>
+    <!-- End of Form for Logout -->
 
-            <div class="dark-mode-btn">
-                <label class="bb8-toggle">
-                    <input class="bb8-toggle__checkbox" type="checkbox" id="darkModeToggle">
-                    <div class="bb8-toggle__container">
-                        <div class="bb8-toggle__scenery">
-                            <div class="bb8-toggle__star"></div>
-                            <div class="bb8-toggle__star"></div>
-                            <div class="bb8-toggle__star"></div>
-                            <div class="bb8-toggle__star"></div>
-                            <div class="bb8-toggle__star"></div>
-                            <div class="bb8-toggle__star"></div>
-                            <div class="bb8-toggle__star"></div>
-                            <div class="tatto-1"></div>
-                            <div class="tatto-2"></div>
-                            <div class="gomrassen"></div>
-                            <div class="hermes"></div>
-                            <div class="chenini"></div>
-                            <div class="bb8-toggle__cloud"></div>
-                            <div class="bb8-toggle__cloud"></div>
-                            <div class="bb8-toggle__cloud"></div>
-                        </div>
-                        <div class="bb8">
-                            <div class="bb8__head-container">
-                                <div class="bb8__antenna"></div>
-                                <div class="bb8__antenna"></div>
-                                <div class="bb8__head"></div>
-                            </div>
-                            <div class="bb8__body"></div>
-                        </div>
-                        <div class="artificial__hidden">
-                            <div class="bb8__shadow"></div>
-                        </div>
-                    </div>
-                </label>
-            </div>
-            {% if user %}
-                <form action="{{ url_for('logout') }}" method="post">
-                    <button type="submit">Sign out</button>
-                </form>
-            {% endif %}
-
-        </nav>
-    </header>
     <!-- Main Menu -->
      <main>
         <div class="user-manager-container">
             <div class="side-menu">
                 <a href="/dashboard" title="Dashboard"><span class="material-symbols-outlined home">widgets</span></a>
                 <a href="/users-manager" class="active active-users" title="Users Management"><span class="material-symbols-outlined users">account_circle</span></a>
-                <a href=""><span class="material-symbols-outlined warehouse">warehouse</span></a>
-                <a href=""><span class="material-symbols-outlined inventory">inventory_2</span></a>
-                <a href=""><span class="material-symbols-outlined shipping">local_shipping</span></a>
-                <a href=""><span class="material-symbols-outlined order">package_2</span></a>
-                <a href=""><span class="material-symbols-outlined ac">ac_unit</span></a>
-                <a href=""><span class="material-symbols-outlined payments">payments</span></a>
-                <a href=""><span class="material-symbols-outlined settings">manufacturing</span></a>
+                <a href="" title="Warehouse"><span class="material-symbols-outlined warehouse">warehouse</span></a>
+                <a href="" title="Stock"><span class="material-symbols-outlined inventory">inventory_2</span></a>
+                <a href="" title="Shipping"><span class="material-symbols-outlined shipping">local_shipping</span></a>
+                <a href="" title="Orders"><span class="material-symbols-outlined order">package_2</span></a>
+                <a href="" title="Climate Controls"><span class="material-symbols-outlined ac">ac_unit</span></a>
+                <a href="" title="Payments"><span class="material-symbols-outlined payments">payments</span></a>
+                <a href="" title="Settings"><span class="material-symbols-outlined settings">manufacturing</span></a>
+                <a href="#" onclick="document.getElementById('logout-form').submit();" title="Logout"><span class="material-symbols-outlined users">logout</span></a>
             </div>
 
             <div class="user-manager-cards-container">
@@ -117,7 +71,7 @@
                                 <p class="new-users-in-30-days deactivated">+{{ deactivated_users_recent_count }}</p>
                             </div>
                             {% if user.user_type == "Admin" or user.user_type == "Manager" %}
-                                <a href="">Reactivate</a>
+                                <a href="/reactivate-users">Reactivate</a>
                             {% endif %}
                         </div>
 

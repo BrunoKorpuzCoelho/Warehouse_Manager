@@ -16,19 +16,3 @@ const toggle = document.getElementById('darkModeToggle');
             }
         });
 
- document.addEventListener("DOMContentLoaded", function() {
-       let lastScrollTop = 0;
-       const header = document.querySelector('.header-dashboard');
-    
-       window.addEventListener('scroll', function() {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-        if (scrollTop > lastScrollTop) {
-            header.classList.add('header-hidden');
-        } else {
-            header.classList.remove('header-hidden');
-        }
-                
-        lastScrollTop = scrollTop;
-    });
-});

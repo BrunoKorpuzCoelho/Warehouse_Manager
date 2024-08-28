@@ -396,6 +396,18 @@ def manager_new_user():
     else:
         user = current_user if current_user.is_authenticated else None
         return render_template("manager_new_user_register.html",  user=user)
+    
+@app.route("/reactivate-users", methods = ["POST", "GET"])
+#@login_required
+def reactivate_users():
+    if request.method == "POST":
+        pass
+    else:
+        all_users = User.query.all()
+
+        user = current_user if current_user.is_authenticated else None
+        return render_template("reactivate.html", user=user, all_users=all_users)
+
 
 def create_user():
     user = User(username="test",

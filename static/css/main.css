@@ -485,7 +485,7 @@ b {
     flex-direction: column;
     gap: 2rem;
     width: 85px; 
-    min-height: 75vh;
+    min-height: 85vh;
     text-align: center;
     padding: 0.3rem;
     background-color: var(--color-white);
@@ -982,4 +982,92 @@ h3 .user-manager-cards-title {
     color: var(--color-danger);
     border-radius: var(--border-radius-2);
     box-shadow: var(--box-shadow);
+}
+
+.reactivate-users-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.reactivate-users-container .reactivate-users-container-header {
+    margin-bottom: 3rem;
+}
+
+.reactivate-users-container .reactivate-users-filters .input-search-user-container {
+    position: relative; 
+    width: 80%; 
+    margin: 0 auto;
+    box-shadow: var(--box-shadow);
+    transition: ease all 0.7s;
+}
+
+.reactivate-users-container .reactivate-users-filters .input-search-user-container:hover {
+    box-shadow: none;
+}
+
+.reactivate-users-container .reactivate-users-filters input[type="text"] {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    background-color: transparent;
+    border: 1px solid var(--color-info-dark);
+    border-radius: var(--border-radius-1);
+    color: var(--color-dark);
+}
+
+.reactivate-users-container .reactivate-users-filters button {
+    position: absolute; 
+    right: 0.2rem; 
+    top: 50%; 
+    padding: 0.1rem 2rem;
+    transform: translateY(-50%); 
+    background: none;
+    border: none; 
+    cursor: pointer; 
+    color: var(--color-dark);
+    transition: all ease 0.7s;
+    border-left: 1px solid var(--color-dark);
+}
+
+.reactivate-users-container .reactivate-users-filters button:hover {
+    color: var(--color-danger);
+    border-left: var(--color-danger) 1px solid ;
+}
+
+.reactivate-users-table {
+    width: 80%;
+    margin: 4rem auto;
+    box-shadow: var(--box-shadow);
+    border-collapse: collapse; 
+}
+
+.reactivate-users-table table {
+    width: 100%;
+}
+
+.reactivate-users-table th, 
+.reactivate-users-table td {
+    padding: 17px 15px; 
+    text-align: left; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    white-space: nowrap; 
+}
+
+.reactivate-users-table th {
+    font-weight: bold; 
+    color: var(--color-danger); 
+    border-bottom: 1px solid var(--color-dark); 
+}
+
+.table-reactivate-user-name p {
+    font-size: 0.7rem;
+}
+
+.reactivate-users-table td {
+    font-size: 0.9rem; 
+}
+
+.reactivate-users-table tbody tr:hover {
+    opacity: 0.5; 
 }
