@@ -8,6 +8,8 @@ import smtplib
 from email.message import EmailMessage
 from sqlalchemy.orm import validates
 import random
+from werkzeug.security import *
+import secrets
 
 # App config
 app = Flask(__name__)
@@ -28,7 +30,7 @@ class User(db.Model, UserMixin):
     cellphone = db.Column(db.String(20))
     create_date = db.Column(db.String(20))
     last_login = db.Column(db.String(20))
-    status = db.Column(db.String(20), default="Active")
+    status = db.Column(db.String(20), default="Operational")
     role = db.Column(db.String(40))
     user_type = db.Column(db.String(50), default="Client")
     pin = db.Column(db.Integer, unique=True)
@@ -232,11 +234,61 @@ class OrderItem(db.Model):
         self.product_id = product_id
         self.quantity = quantity
 
+# Email configuration
+SMTP_SERVER = 'smtp-mail.outlook.com'
+SMTP_PORT = 587
+SMTP_EMAIL = "********************************"
+SMTP_PASSWORD = "********************************" 
+
+# Default Email Configuration
+def send_email(to_email, subject, body):
+    msg = EmailMessage()
+    msg['From'] = SMTP_EMAIL
+    msg['To'] = to_email
+    msg['Subject'] = subject
+    msg.set_content(body)
+
+    try:
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_EMAIL, SMTP_PASSWORD)
+            server.send_message(msg)
+            print(f"Email sent to {to_email} with subject: {subject}")
+    except Exception as e:
+        print(f"Failed to send email to {to_email}. Error: {e}")
+
+# Registration Email
+def send_registration_email(user):
+    subject = "Welcome to Our Service!"
+    body = f"""
+    Hi {user.name},
+
+    Thank you for registering on our platform.
+
+    Best regards,
+    Your Company Team
+    """
+    send_email(user.email, subject, body)
+
+# Forgot Password Email
+def send_password_reset_email(user, new_password):
+    subject = "Your Password Has Been Reset"
+    body = f"""
+    Hi {user.name},
+
+    Your password has been reset. Your new password is: {new_password}
+
+    Please log in and change your password as soon as possible.
+
+    Best regards,
+    Your Company Team
+    """
+    send_email(user.email, subject, body)
+
 # Login manager
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
-
 
 # Validates user type
 @validates("user_type")
@@ -305,7 +357,7 @@ def user_manager():
             if user_create_date >= thirty_days_ago:
                 new_users_count += 1
 
-            if u.status == 'Deactive':
+            if u.status == 'Inactive':
                 deactivated_users_count += 1
                 if user_create_date >= ninety_days_ago:
                     deactivated_users_recent_count += 1
@@ -391,6 +443,9 @@ def manager_new_user():
         print("Permissions have been successfully added.")
         db.session.commit()
 
+        send_registration_email(new_user)
+        print("Registration Email has been successfully send")
+
         return redirect(url_for("user_manager"))
 
     else:
@@ -398,7 +453,7 @@ def manager_new_user():
         return render_template("manager_new_user_register.html",  user=user)
     
 @app.route("/reactivate-users", methods = ["POST", "GET"])
-#@login_required
+@login_required
 def reactivate_users():
     if request.method == "POST":
         pass
@@ -407,6 +462,80 @@ def reactivate_users():
 
         user = current_user if current_user.is_authenticated else None
         return render_template("reactivate.html", user=user, all_users=all_users)
+    
+@app.route('/change-user-status/<int:user_id>/<new_status>', methods=['POST'])
+@login_required
+def change_user_status(user_id, new_status):
+    user = User.query.get(user_id) 
+    if user:
+        if new_status in ['Operational', 'Inactive']: 
+            user.status = new_status  
+            db.session.commit() 
+            flash(f'User {user.name} status changed to {new_status}.', 'success')
+        else:
+            flash('Invalid status value.', 'danger')
+    else:
+        flash('User not found.', 'danger')
+
+    return redirect(url_for('reactivate_users'))
+
+@app.route("/edit-user/<int:user_id>", methods=["POST", "GET"])
+@login_required
+def edit_user(user_id):
+    user_to_edit = User.query.get(user_id) 
+    if not user_to_edit:
+        flash("User not found.", "danger")
+        return redirect(url_for("user_manager")) 
+    
+    if request.method == "POST":
+
+        if request.form["username"] != user_to_edit.username:
+            user_to_edit.username = request.form["username"]
+        
+        if request.form["name"] != user_to_edit.name:
+            user_to_edit.name = request.form["name"]
+
+        if request.form["nif"] != user_to_edit.nif:
+            user_to_edit.nif = request.form["nif"]
+
+        if request.form["cellphone"] != user_to_edit.cellphone:
+            user_to_edit.cellphone = request.form["cellphone"]
+
+        if request.form["email"] != user_to_edit.email:
+            user_to_edit.email = request.form["email"]
+
+        if request.form["role"] != user_to_edit.role:
+            user_to_edit.role = request.form["role"]
+
+        if request.form["user_type"] != user_to_edit.user_type:
+            user_to_edit.user_type = request.form["user_type"]
+
+        db.session.commit()
+        flash("User details updated successfully.", "success")
+        return redirect(url_for("user_manager"))
+        
+
+    else:
+        user = current_user if current_user.is_authenticated else None
+        return render_template("edit_user.html", user=user, user_to_edit=user_to_edit)
+    
+@app.route("/reset-password/<int:user_id>", methods=["POST"])
+@login_required
+def reset_password(user_id):
+    user = User.query.get(user_id)
+
+    if user:
+        new_password = secrets.token_hex(4)  
+        user.password = generate_password_hash(new_password) 
+        db.session.commit()
+        flash("Password reset successfully. The new password has been sent to the user's email.", "success")
+        
+        send_password_reset_email(user, new_password)
+        print("Password reset successfully and email sent.")
+    else:
+        flash("User not found.", "danger")
+
+    return redirect(url_for("user_manager"))
 
 
 def create_user():

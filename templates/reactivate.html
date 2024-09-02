@@ -47,8 +47,8 @@
 
                 <div class="reactivate-users-filters">
                     <div class="input-search-user-container"> 
-                        <input type="text" id="filter-users" placeholder="Search for users...">
-                        <button type="submit"><span class="material-symbols-outlined">search</span></button>
+                        <input type="text" id="filter-users" placeholder="Search for users..." title="Search for Users">
+                        <button type="submit" title="Search"><span class="material-symbols-outlined">search</span></button>
                     </div>
                 </div>
 
@@ -76,7 +76,15 @@
                                 <td>{{ user.role }}</td>
                                 <td>{{ user.status }}</td>
                                 <td>
-                                    
+                                    {% if user.status == 'Operational' %}
+                                        <form action="{{ url_for('change_user_status', user_id=user.id, new_status='Inactive') }}" method="post">
+                                            <button type="submit" class="btn-inactive">Inactive</button>
+                                        </form>
+                                    {% else %}
+                                        <form action="{{ url_for('change_user_status', user_id=user.id, new_status='Operational') }}" method="post">
+                                            <button type="submit" class="btn-activate">Active</button>
+                                        </form>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% endfor %}

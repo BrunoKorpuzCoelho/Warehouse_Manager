@@ -964,26 +964,6 @@ h3 .user-manager-cards-title {
     stroke-dashoffset: -262.2723388671875;
 }
 
-.manager-new-registration form button {
-    width:10%;
-    padding: 1rem;
-    border: none;
-    border-radius: var(--border-radius-1);
-    background-color: var(--color-danger);
-    color:var(--color-dark);
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: 0.7s ease all;
-    margin-top: 2rem;
-}
-
-.manager-new-registration form button:hover {
-    background-color: var(--color-dark);
-    color: var(--color-danger);
-    border-radius: var(--border-radius-2);
-    box-shadow: var(--box-shadow);
-}
-
 .reactivate-users-container {
     display: flex;
     flex-direction: column;
@@ -1036,13 +1016,39 @@ h3 .user-manager-cards-title {
 
 .reactivate-users-table {
     width: 80%;
+    height: 39rem;
     margin: 4rem auto;
+    overflow-y: scroll;
+    border-radius: var(--border-radius-1);
+    padding: var(--padding-1);
     box-shadow: var(--box-shadow);
     border-collapse: collapse; 
+    transition: 0.7s ease all;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-dark) var(--color-light);
 }
 
 .reactivate-users-table table {
     width: 100%;
+}
+
+.reactivate-users-table:hover {
+    box-shadow: none;
+}
+
+.reactivate-users-table::-webkit-scrollbar {
+    width: 1px; 
+}
+
+.reactivate-users-table::-webkit-scrollbar-track {
+    background: var(--color-light); 
+    border-radius: 10px; 
+}
+
+.reactivate-users-table::-webkit-scrollbar-thumb {
+    background-color: var(--color-dark); 
+    border-radius: 10px; 
+    border: 2px solid var(--color-light); 
 }
 
 .reactivate-users-table th, 
@@ -1070,4 +1076,93 @@ h3 .user-manager-cards-title {
 
 .reactivate-users-table tbody tr:hover {
     opacity: 0.5; 
+}
+
+.btn-inactive {
+    display: flex;
+    background-color: var(--color-danger);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: var(--border-radius-1);
+    color: #FFF;
+    width: 70%;
+    justify-content: center;
+}
+
+.btn-activate {
+    display: flex;
+    background-color: var(--color-success);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: var(--border-radius-1);
+    color: #FFF;
+    width: 70%;
+    justify-content: center;
+}
+
+.edit-user-submit-btn {
+    font-family: inherit;
+    display: inline-block;
+    width: 8rem;
+    height: 2.6rem;
+    line-height: 2.5rem;
+    margin: 20px;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    border: 2px solid var(--color-danger);
+    transition: color 0.5s;
+    z-index: 1;
+    font-size: 17px;
+    border-radius: 6px;
+    font-weight: 500;
+    color: var(--color-danger);
+    background-color: #181a1e;
+  }
+  
+  .edit-user-submit-btn:before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    background: var(--color-danger);
+    height: 130px;
+    width: 180px;
+    border-radius: 50%;
+  }
+  
+  .edit-user-submit-btn:hover {
+    color: var(--color-danger);
+    color: #FFF;
+  }
+  
+  .edit-user-submit-btn:before {
+    top: 100%;
+    left: 100%;
+    transition: all 0.7s;
+  }
+  
+  .edit-user-submit-btn:hover:before {
+    top: -30px;
+    left: -30px;
+  }
+  
+  .edit-user-submit-btn:active:before {
+    background: var(--color-danger);
+    transition: background 2s;
+  }
+
+.manager-new-registration form .edit-password-btn-hidden {
+    border: 1px solid  var(--color-dark);
+    background-color: transparent;
+    width: 100%;
+    cursor: pointer;
+    transition: 0.7s all ease;
+    border-radius: var(--border-radius-1);
+    color: var(--color-dark);
+    padding: 1rem 1rem;
+}
+
+.manager-new-registration form .edit-password-btn-hidden:hover {
+    background-color: var(--color-success);
+    border: solid 1px var(--color-success);
 }
