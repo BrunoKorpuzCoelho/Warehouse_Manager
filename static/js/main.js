@@ -17,7 +17,6 @@ const toggle = document.getElementById('darkModeToggle');
         });
 
         function resetPassword(button) {
-            // Obtém o ID do usuário do atributo data-user-id
             const userId = button.getAttribute('data-user-id');
         
             if (confirm('Are you sure you want to reset the password for this user?')) {
@@ -25,13 +24,13 @@ const toggle = document.getElementById('darkModeToggle');
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-CSRFToken': "{{ csrf_token() }}" // Certifique-se de incluir o token CSRF para segurança
+                        'X-CSRFToken': "{{ csrf_token() }}"
                     }
                 })
                 .then(response => response.text())
                 .then(data => {
                     alert('Password reset successfully.');
-                    location.reload();  // Atualiza a página para refletir as alterações
+                    location.reload();  
                 })
                 .catch(error => {
                     console.error('Error:', error);

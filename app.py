@@ -10,6 +10,7 @@ from sqlalchemy.orm import validates
 import random
 from werkzeug.security import *
 import secrets
+from colorama import *
 
 # App config
 app = Flask(__name__)
@@ -38,7 +39,7 @@ class User(db.Model, UserMixin):
     product_movements = db.relationship('ProductMovements', back_populates='user', lazy=True)
     permissions = db.relationship("UserPermissions", uselist=False, back_populates="user")
 
-    def __init__(self, username, password, nif, email, name, cellphone, role=None, last_login=None, status="Active", user_type="Client"):
+    def __init__(self, username, password, nif, email, name, cellphone, role=None, last_login=None, status="Operational", user_type="Client"):
         self.username = username
         self.password = password
         self.nif = nif
@@ -237,8 +238,8 @@ class OrderItem(db.Model):
 # Email configuration
 SMTP_SERVER = 'smtp-mail.outlook.com'
 SMTP_PORT = 587
-SMTP_EMAIL = "********************************"
-SMTP_PASSWORD = "********************************" 
+SMTP_EMAIL = "cubix-no-reply@hotmail.com"
+SMTP_PASSWORD = "Brunocoelho1" 
 
 # Default Email Configuration
 def send_email(to_email, subject, body):
@@ -248,25 +249,58 @@ def send_email(to_email, subject, body):
     msg['Subject'] = subject
     msg.set_content(body)
 
+    msg.add_alternative(body, subtype='html')
+
     try:
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
             server.starttls()
             server.login(SMTP_EMAIL, SMTP_PASSWORD)
             server.send_message(msg)
-            print(f"Email sent to {to_email} with subject: {subject}")
+            print(f"{Fore.GREEN}Email sent to {to_email} with subject: {subject}")
     except Exception as e:
-        print(f"Failed to send email to {to_email}. Error: {e}")
+        print(f"{Fore.RED}Failed to send email to {to_email}. Error: {e}")
 
 # Registration Email
 def send_registration_email(user):
     subject = "Welcome to Our Service!"
-    body = f"""
-    Hi {user.name},
+    body = f"""<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Email | Cubix</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
 
-    Thank you for registering on our platform.
+    <!-- Main Container  -->
+    <div style="max-width: 600px; margin: 0 auto; background-color: #181a1e; padding: 20px; border-radius: 8px;">
 
-    Best regards,
-    Your Company Team
+        <!-- Header -->
+        <div style="text-align: center; padding: 10px 0;">
+            <img src="https://i.postimg.cc/Hkfrz86R/Cubix-White.png" alt="Cubix Logo" style="width: 100px; margin-bottom: 20px;">
+        </div>
+
+        <!-- Main content -->
+        <div style="background-color: #181a1e; color: #ffffff; padding: 20px; border-radius: 8px;">
+            <h1 style="color: #ffffff; text-align: center;">Welcome to <span style="color: #ff0060;">Cubix!</span></h1>
+            <p style="color: #ffffff;">Hi <span style="color: #ff0060;">{user.name}</span>,</p>
+            <p style="color: #ffffff;">Thank you for registering on our platform.</p>
+            <p style="color: #ffffff;">We are providing you with the login credentials for your account as requested. Below are your username and <span style="color: #f7d060; text-decoration: underline; font-size: 1.05rem;">temporary password</span> to access the platform. <span style="color: #1b9c85; font-size: 1.05rem;">We recommend changing the password upon your first login to ensure your account's security.</span></p>
+            <p style="color: #ffffff; margin-top: 3rem;">Username: <span style="color: #1b9c85; font-size: 1.2rem;">{user.username}</span></p>
+            <p style="color: #ffffff; margin-bottom: 3rem;">Temporary Password: <span style="color: #1b9c85; margin-top: 1rem; font-size: 1.2rem;">{user.password}</span></p>
+            <p style="color: #ffffff;">Best regards,</p>
+            <p style="color: #ffffff;">Your Company Team</p>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; color: #ffffff; background-color: #181a1e; padding: 10px; border-radius: 8px; margin-top: 20px;">
+            <p style="margin: 0;">Please be advised that this email was generated automatically from a non-monitored account. We kindly ask that you <span style="color: #ff0060;">do not reply directly to this message.</span></p>
+            <p style="margin: 0;">For any assistance or inquiries, please contact our support team through the designated channels.</p>
+            <p style="margin: 0;">For any authentication-related inquiries, please send an email to <span style="color: #1b9c85; font-size: 1.05rem;">brunovcoelho.dev@gmail.com</span> or <a href="https://wa.me/351965576916?text=Hello,%0A%0AI%20require%20assistance%20regarding%20authentication%20issues%20with%20my%20account.%0A%0AThank%20you%20for%20your%20attention.%0A%0ABest%20regards." target="_blank" style="text-decoration: none; color: #f7d060;">click here</a> to reach our support team.</p>
+        </div>
+    </div>
+
+</body>
+</html>
     """
     send_email(user.email, subject, body)
 
@@ -421,7 +455,7 @@ def manager_new_user():
 
         db.session.add(new_user)
         db.session.commit()
-        print("The user has been successfully created.")
+        print(f"{Fore.GREEN}The user has been successfully created.") 
 
         new_user_permissions = UserPermissions(
             user_id=new_user.id,
@@ -440,11 +474,11 @@ def manager_new_user():
         )
 
         db.session.add(new_user_permissions)
-        print("Permissions have been successfully added.")
+        print(f"{Fore.GREEN}Permissions have been successfully added.") 
         db.session.commit()
 
         send_registration_email(new_user)
-        print("Registration Email has been successfully send")
+        print(f"{Fore.GREEN}Registration Email has been successfully sent")
 
         return redirect(url_for("user_manager"))
 
@@ -531,12 +565,22 @@ def reset_password(user_id):
         flash("Password reset successfully. The new password has been sent to the user's email.", "success")
         
         send_password_reset_email(user, new_password)
-        print("Password reset successfully and email sent.")
+        print("{Fore.GREEN}Password reset successfully and email sent.")
     else:
         flash("User not found.", "danger")
 
     return redirect(url_for("user_manager"))
 
+@app.route("/all_users_page", methods=["GET", "POST"])
+@login_required
+def all_users_page():
+    all_users = User.query.all()
+
+    if request.method == "POST":
+        pass
+    else:
+        user = current_user if current_user.is_authenticated else None
+        return render_template("all_users_page.html", user=user , all_users=all_users)
 
 def create_user():
     user = User(username="test",
@@ -549,9 +593,10 @@ def create_user():
                 )
     db.session.add(user)
     db.session.commit()
-    print("Criado Com sucesso")
+    print(f"{Fore.GREEN}Criado Com sucesso")
 
 if __name__ == "__main__":
+    init(autoreset=True)
     with app.app_context():
         db.create_all()
         #create_user()

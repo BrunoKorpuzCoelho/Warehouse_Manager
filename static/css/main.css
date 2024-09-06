@@ -53,7 +53,7 @@ body {
     justify-content: center;
     align-items: center;
     font-family: Arial, Helvetica, sans-serif;
-    user-select: none;
+    /* user-select: none; */
     color: var(--color-dark);
     background-color: var(--color-background);
     transition: all 0.7s ease;
@@ -734,6 +734,11 @@ h3 .user-manager-cards-title {
     word-wrap: break-word
 }
 
+.user-detail-list table a:hover {
+    color: var(--color-danger);
+    opacity: 1;
+}
+
 .user-name-table {
     display: flex;
     flex-direction: row;
@@ -767,7 +772,7 @@ h3 .user-manager-cards-title {
 }
 
 .user-detail-list tbody tr:hover {
-    opacity: 0.5;
+    background-color: #16191b;
 }
 
 .user-detail-list th {
@@ -1165,4 +1170,8 @@ h3 .user-manager-cards-title {
 .manager-new-registration form .edit-password-btn-hidden:hover {
     background-color: var(--color-success);
     border: solid 1px var(--color-success);
+}
+
+.all-users-details {
+    margin-bottom: 2rem;
 }
