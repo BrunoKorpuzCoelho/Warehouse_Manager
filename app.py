@@ -238,8 +238,8 @@ class OrderItem(db.Model):
 # Email configuration
 SMTP_SERVER = 'smtp-mail.outlook.com'
 SMTP_PORT = 587
-SMTP_EMAIL = "cubix-no-reply@hotmail.com"
-SMTP_PASSWORD = "Brunocoelho1" 
+SMTP_EMAIL = "***********"
+SMTP_PASSWORD = "****************" 
 
 # Default Email Configuration
 def send_email(to_email, subject, body):
