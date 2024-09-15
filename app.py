@@ -235,11 +235,33 @@ class OrderItem(db.Model):
         self.product_id = product_id
         self.quantity = quantity
 
+class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    subject = db.Column(db.String(100))
+    body = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    type = db.Column(db.String, default = "In")
+    is_read = db.Column(db.Boolean, default=False)
+
+    sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_messages')
+    receiver = db.relationship('User', foreign_keys=[receiver_id], backref='received_messages')
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    message_id = db.Column(db.Integer, db.ForeignKey('message.id'), nullable=False)
+    is_viewed = db.Column(db.Boolean, default=False)
+
+    user = db.relationship('User', backref='notifications')
+    message = db.relationship('Message', backref='notifications')
+
 # Email configuration
 SMTP_SERVER = 'smtp-mail.outlook.com'
 SMTP_PORT = 587
-SMTP_EMAIL = "***********"
-SMTP_PASSWORD = "****************" 
+SMTP_EMAIL = "************************"
+SMTP_PASSWORD = "************************" 
 
 # Default Email Configuration
 def send_email(to_email, subject, body):
@@ -347,9 +369,11 @@ def login():
             login_user(user)
             user.last_login = datetime.now().strftime('%d/%m/%Y %H:%M')
             db.session.commit()
+            print(f"{Fore.GREEN}Login successful.")
             return redirect(url_for("dashboard"))
         else:
             error = "Invalid username or password"
+            print(f"{Fore.RED}Invalid username or password")
             return render_template("login.html", error=error)
         
     user = current_user if current_user.is_authenticated else None
@@ -365,6 +389,7 @@ def dashboard():
 @login_required
 def logout():
     logout_user()
+    print(f"{Fore.GREEN}Logout successful.")
     return redirect(url_for('login'))
 
 @app.route("/users-manager", methods=["GET", "POST"])
@@ -506,10 +531,13 @@ def change_user_status(user_id, new_status):
             user.status = new_status  
             db.session.commit() 
             flash(f'User {user.name} status changed to {new_status}.', 'success')
+            print(f"{Fore.GREEN} Status changed to {new_status}")
         else:
             flash('Invalid status value.', 'danger')
+            print(f"{Fore.RED} Invalid status value.")
     else:
         flash('User not found.', 'danger')
+        print(f"{Fore.RED} User not found.")
 
     return redirect(url_for('reactivate_users'))
 
@@ -519,6 +547,7 @@ def edit_user(user_id):
     user_to_edit = User.query.get(user_id) 
     if not user_to_edit:
         flash("User not found.", "danger")
+        print(f"{Fore.RED} User not found.")
         return redirect(url_for("user_manager")) 
     
     if request.method == "POST":
@@ -546,6 +575,7 @@ def edit_user(user_id):
 
         db.session.commit()
         flash("User details updated successfully.", "success")
+        print(f"{Fore.GREEN} User details updated successfully.")
         return redirect(url_for("user_manager"))
         
 
@@ -565,7 +595,7 @@ def reset_password(user_id):
         flash("Password reset successfully. The new password has been sent to the user's email.", "success")
         
         send_password_reset_email(user, new_password)
-        print("{Fore.GREEN}Password reset successfully and email sent.")
+        print(f"{Fore.GREEN}Password reset successfully and email sent.")
     else:
         flash("User not found.", "danger")
 
@@ -581,6 +611,69 @@ def all_users_page():
     else:
         user = current_user if current_user.is_authenticated else None
         return render_template("all_users_page.html", user=user , all_users=all_users)
+    
+@app.route("/change-permissions", methods=["GET", "POST"])
+@login_required
+def change_user_permissions():
+    user = current_user if current_user.is_authenticated else None
+    if user.user_type == "Admin" or user.user_type == "Manager":
+        if request.method == "POST":
+            search_term = request.form.get("search_term", "").strip()
+            search_results = User.query.filter(User.nif.contains(search_term)).all()
+            if search_results:
+                user_permissions = UserPermissions.query.filter_by(user_id=search_results[0].id).first()
+            else:
+                user_permissions = None
+            return render_template("change_permissions.html", user=user, search_results=search_results, user_permissions=user_permissions)
+        else:
+            return render_template("change_permissions.html", user=user)
+    else:
+        print(f"{Fore.RED}The user type is not supported for this page.")
+        return "Access Denied", 403
+
+@app.route('/update-permissions/<int:user_id>', methods=['POST'])
+@login_required
+def update_user_permissions(user_id):
+    user = User.query.get_or_404(user_id)
+
+    permissions = {
+        'can_create_new_users': request.form.get('can_create_new_users') == 'on',
+        'can_active_users': request.form.get('can_active_users') == 'on',
+        'can_adjust_inventory_differences': request.form.get('can_adjust_inventory_differences') == 'on',
+        'can_manage_suppliers': request.form.get('can_manage_suppliers') == 'on',
+        'can_view_temperature_logs': request.form.get('can_view_temperature_logs') == 'on',
+        'can_adjust_temperature_discrepancies': request.form.get('can_adjust_temperature_discrepancies') == 'on',
+        'can_access_high_security_areas': request.form.get('can_access_high_security_areas') == 'on',
+        'can_generate_financial_reports': request.form.get('can_generate_financial_reports') == 'on',
+        'can_manage_user_permissions': request.form.get('can_manage_user_permissions') == 'on',
+        'can_view_audit_logs': request.form.get('can_view_audit_logs') == 'on',
+        'can_override_automatic_system_flags': request.form.get('can_override_automatic_system_flags') == 'on',
+        'can_manage_orders': request.form.get('can_manage_orders') == 'on'
+    }
+
+    user_permissions = UserPermissions.query.filter_by(user_id=user_id).first()
+
+    if user_permissions:
+        for key, value in permissions.items():
+            setattr(user_permissions, key, value)
+    else:
+        user_permissions = UserPermissions(user_id=user_id, **permissions)
+        db.session.add(user_permissions)
+
+    print("Permissions changed successfully")
+    db.session.commit()
+
+    flash(f"{Fore.GREEN}User permissions updated successfully.", "success")
+    return redirect(url_for('change_user_permissions'))
+
+@app.route("/user-settings/<int:user_id>", methods=["GET","POST"])
+@login_required
+def user_settings(user_id):
+     user = current_user if current_user.is_authenticated else None
+     if request.method == "POST":
+         pass
+     else:
+         return render_template("user_settings.html", user=user)
 
 def create_user():
     user = User(username="test",

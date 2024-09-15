@@ -36,6 +36,7 @@
                 <a href="" title="Orders"><span class="material-symbols-outlined order">package_2</span></a>
                 <a href="" title="Climate Controls"><span class="material-symbols-outlined ac">ac_unit</span></a>
                 <a href="" title="Payments"><span class="material-symbols-outlined payments">payments</span></a>
+                <a href="" title="Messages" class="messages-a"><span class="material-symbols-outlined mail">mail</span><span class="mesage-count">10</span></a>
                 <a href="" title="Settings"><span class="material-symbols-outlined settings">manufacturing</span></a>
                 <a href="#" onclick="document.getElementById('logout-form').submit();" title="Logout"><span class="material-symbols-outlined users">logout</span></a>
             </div>
@@ -54,7 +55,7 @@
                                 <p class="new-users-in-30-days">+{{ new_users_count }}</p>
                             </div>
                             {% if user.user_type == "Admin" or user.user_type == "Manager" %}
-                                <a href="/manager-new-user">New User</a>
+                                <a href="/manager-new-user" class="btn-shine">New User</a>
                             {% endif %}
                         </div>
 
@@ -71,7 +72,7 @@
                                 <p class="new-users-in-30-days deactivated">+{{ deactivated_users_recent_count }}</p>
                             </div>
                             {% if user.user_type == "Admin" or user.user_type == "Manager" %}
-                                <a href="/reactivate-users">Reactivate</a>
+                                <a href="/reactivate-users" class="btn-shine">Reactivate</a>
                             {% endif %}
                         </div>
 
@@ -88,7 +89,7 @@
                                 <p class="new-users-in-30-days">/12</p>
                             </div>
                             {% if user.user_type == "Admin" or user.user_type == "Manager" %}
-                                <a href="">Add Permission</a>
+                                <a href="/change-permissions" class="btn-shine">Add Permission</a>
                             {% endif %}
                         </div>
 
@@ -104,7 +105,7 @@
                                 <h2 class="number-of-users">10</h2>
                             </div>
                             {% if user.user_type == "Admin" or user.user_type == "Manager" %}
-                            <a href="">Manage Settings</a>
+                            <a href="{{ url_for('user_settings', user_id=user.id) }}" class="btn-shine">Manage Settings</a>
                             {% endif %}
                         </div>
 
