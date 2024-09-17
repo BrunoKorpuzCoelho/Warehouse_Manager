@@ -27,7 +27,6 @@
 
     <!-- Main Menu -->
      <main>
-        <div class="user-manager-container">
             <div class="user-manager-container">
                 <div class="side-menu">
                     <a href="/dashboard" title="Dashboard"><span class="material-symbols-outlined home">widgets</span></a>
@@ -47,86 +46,125 @@
                     <h3>{{ user.name }}</h3>
                 </div>
 
-                <div class="schedule_container_wrap">
-                    <div class="schedule_container">
-                        <h3>Time <span class="danger">Tracking</span></h3>
-                        <p class="schedule_container-head-info-p">Check-in and check-out for your shift.</p>
-                        <div class="time-tracking-container">
-                            <form action="" method="POST">
-                                <div class="form-date">
-                                    <div class="form-row">
-                                        <label for="date">Date:</label>
-                                        <input type="date" id="date" name="date" disabled>
-                    
-                                        <label for="time">Time:</label>
-                                        <input type="time" id="time" name="time" disabled>
+                <div class="main-schedule-container">
+                    <div class="schedule_container_wrap">
+                        <div class="schedule_container">
+                            <h3>Time <span class="danger">Tracking</span></h3>
+                            <p class="schedule_container-head-info-p">Check-in and check-out for your shift.</p>
+                            <div class="time-tracking-container">
+                                <form action="" method="POST">
+                                    <div class="form-date">
+                                        <div class="form-row">
+                                            <label for="date">Date:</label>
+                                            <input type="date" id="date" name="date" disabled>
+                        
+                                            <label for="time">Time:</label>
+                                            <input type="time" id="time" name="time" disabled>
 
-                                        <div class="permission-checkbox">
-                                            <label for="log_type">Automatic</label>
-                                            <label class="container-checkbox">
-                                            <input type="checkbox" id="log_type" name="log_type" checked>
-                                            <svg viewBox="0 0 64 64" height="1rem" width="2rem">
-                                                <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
-                                            </svg>
-                                            </label>
+                                            <div class="permission-checkbox">
+                                                <label for="log_type">Automatic</label>
+                                                <label class="container-checkbox">
+                                                <input type="checkbox" id="log_type" name="log_type" checked>
+                                                <svg viewBox="0 0 64 64" height="1rem" width="2rem">
+                                                    <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
+                                                </svg>
+                                                </label>
+                                            </div>
                                         </div>
-                                    </div>
-                    
-                                    <div class="form-row">
-                                        <label for="justification">Justification:</label>
-                                        <textarea id="justification" name="justification" rows="5" cols="50" disabled></textarea>
-                                    </div>
+                        
+                                        <div class="form-row">
+                                            <label for="justification">Justification:</label>
+                                            <textarea id="justification" name="justification" rows="5" cols="50" disabled></textarea>
+                                        </div>
 
-                                    <button type="submit" class="btn-shine time-tracking-submit-btn">Record Time</button>
-                                </div>
-                            </form>
+                                        <button type="submit" class="btn-shine time-tracking-submit-btn">Record Time</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="schedule_time_user_wrap">
+                            <h3>Current <span class="danger">Work Shift</span></h3>
+                            <p class="schedule_container-head-info-p">Review your assigned shift for today.</p>
+                            <div class="schedule_time_user">
+                                <table class="work-shift-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Description</th>
+                                            <th>Hour</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if work_schedule %}
+                                            <tr>
+                                                <td>Start Time</td>
+                                                <td>{{ work_schedule.time_in }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>End Time</td>
+                                                <td>{{ work_schedule.time_out }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Lunch Break Start</td>
+                                                <td>{{ work_schedule.lunch_start }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Lunch Break End</td>
+                                                <td>{{ work_schedule.lunch_end }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Total Hours</td>
+                                                <td>
+                                                    {% if total_work_hours is not none %}
+                                                        {{ total_work_hours | round(2) }}
+                                                    {% else %}
+                                                        N/A
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="3">No schedule available for today.</td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                                <a href="" class="table-more-info-a">show more schedule info</a>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="schedule_time_user_wrap">
-                        <h3>Current <span class="danger">Work Shift</span></h3>
-                        <p class="schedule_container-head-info-p">Review your assigned shift for today.</p>
-                        <div class="schedule_time_user">
-                            <table class="work-shift-table">
-                                <thead>
-                                    <tr>
-                                        <th>Description</th>
-                                        <th>Hour</th>
-                                        <th>Period</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Start Time</td>
-                                        <td>9</td>
-                                        <td>AM</td>
-                                    </tr>
-                                    <tr>
-                                        <td>End Time</td>
-                                        <td>6</td>
-                                        <td>PM</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Lunch Break Start</td>
-                                        <td>12</td>
-                                        <td>PM</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Lunch Break End</td>
-                                        <td>1</td>
-                                        <td>PM</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Total Hours</td>
-                                        <td>8</td>
-                                        <td>N/A</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <a href="">show more sechedule info</a>
-                        </div>
+                    <div class="last_schedule_records">
+                        <table class="records-table">
+                            <thead>
+                                <tr>
+                                    <th>Record Number</th>
+                                    <th>Record Date and Time</th>
+                                    <th>Record Type</th>
+                                    <th>Justification</th>
+                                    <th>Approved</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in logs %}
+                                <tr>
+                                    <td>{{ loop.index }}</td> 
+                                    <td>{{ log.create_date_in }}</td>
+                                    <td>{{ log.log_type }}</td>
+                                    <td>{{ log.justification }}</td>
+                                    <td>{{ log.status }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5">No records available.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>      
+                        <a href="" class="table-more-info-a">Show more records history</a>                  
                     </div>
                 </div>
+            </div>
         </div>
      </main>
      <script src="/static/js/main.js"></script>

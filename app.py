@@ -301,20 +301,27 @@ class AssignedSchedules(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     schedule_id = db.Column(db.Integer, db.ForeignKey('work_schedules.id'))
     date = db.Column(db.String)
+    status = db.Column(db.String(20), default="Pending")
+    is_active = db.Column(db.Boolean, default=False)
+    previous_schedule_id = db.Column(db.Integer, db.ForeignKey('assigned_schedules.id'))
 
     user = db.relationship('User', lazy=True)
     schedule = db.relationship('WorkSchedules', backref='assigned_schedules', lazy=True)
+    previous_schedule = db.relationship('AssignedSchedules', remote_side=[id], backref='replaced_by')
 
-    def __init__(self, user_id, schedule_id, date):
+    def __init__(self, user_id, schedule_id, date, status, is_active, previous_schedule_id):
         self.user_id = user_id
         self.schedule_id = schedule_id
         self.date = date
+        self.status = status
+        self.is_active = is_active
+        self.previous_schedule_id = previous_schedule_id
 
 # Email configuration
 SMTP_SERVER = 'smtp-mail.outlook.com'
 SMTP_PORT = 587
-SMTP_EMAIL = "**********"
-SMTP_PASSWORD = "*******" 
+SMTP_EMAIL = "***"
+SMTP_PASSWORD = "***" 
 
 # Default Email Configuration
 def send_email(to_email, subject, body):
@@ -752,10 +759,42 @@ def user_settings(user_id):
 @login_required
 def schedule():
     user = current_user if current_user.is_authenticated else None
+
+    today = datetime.now().strftime('%d/%m/%Y') 
+
+    assigned_schedule = None
+    work_schedule = None
+    total_work_hours = None
+
+    assigned_schedule = AssignedSchedules.query.filter_by(user_id=user.id, date=today).first()
+
+    if assigned_schedule:
+        schedule_id = assigned_schedule.schedule_id
+        
+        work_schedule = WorkSchedules.query.filter_by(id=schedule_id).first()
+
+        if work_schedule:
+            time_in = datetime.strptime(work_schedule.time_in, "%H:%M")
+            time_out = datetime.strptime(work_schedule.time_out, "%H:%M")
+            lunch_start = datetime.strptime(work_schedule.lunch_start, "%H:%M") if work_schedule.lunch_start else None
+            lunch_end = datetime.strptime(work_schedule.lunch_end, "%H:%M") if work_schedule.lunch_end else None
+
+            total_work_time = time_out - time_in
+            
+            if lunch_start and lunch_end:
+                lunch_break_duration = lunch_end - lunch_start
+                total_work_time -= lunch_break_duration
+
+            total_work_hours = total_work_time.total_seconds() / 3600
+    else:
+        work_schedule = None
+    
+    logs = WorkSchedulesLogs.query.filter_by(user_id=user.id).order_by(WorkSchedulesLogs.create_date_in.desc()).all()
+
     if request.method == "POST":
         pass
     else:
-        return render_template("schedule_home.html", user=user)
+        return render_template("schedule_home.html", user=user, work_schedule=work_schedule, total_work_hours=total_work_hours, logs=logs)
 
 def create_user():
     user = User(username="test",
@@ -807,7 +846,14 @@ def assign_schedules_for_september(user_id=1):
         
         date_str = current_date.strftime('%d/%m/%Y')
 
-        new_schedule = AssignedSchedules(user_id=user_id, schedule_id=schedule_id, date=date_str)
+        new_schedule = AssignedSchedules(
+            user_id=user_id,
+            schedule_id=schedule_id,
+            date=date_str,
+            status = "Approved",
+            is_active = True,
+            previous_schedule_id = 0
+            )
         db.session.add(new_schedule)
 
         current_date += timedelta(days=1)
@@ -824,5 +870,7 @@ if __name__ == "__main__":
         db.create_all()
         #create_user()
         #create_work_schedules()
-        assign_schedules_for_september()
-    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
+        #assign_schedules_for_september()
+    app.run(host="0.0.0.0", port=5000, debug=True)
+
+    # use_reloader=False
