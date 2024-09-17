@@ -44,7 +44,7 @@
             <div class="user-settings-container">
                 <div class="user-settings-card">
                     <h2>Profile <span class="danger">Settings</span></h2>
-                    <form action="">
+                    <form action="{{ url_for('user_settings', user_id=user.id) }}" method="POST">
                         <label for="name">Name</label>
                         <input type="text" name="name" placeholder="{{ user.name }}">
             
@@ -62,9 +62,9 @@
                 </div>
 
                 <div class="user-settings-card">
-                    <h2>Web Site <span class="danger">Preferences</span></h2>
-                    <p class="user-settings-card-p-theme">Theme</p>
+                    <h2>Website <span class="danger">Preferences</span></h2>
                     <div class="theme-preference">
+                        <p class="user-settings-card-p-theme">Theme:</p>
                         <p>Light</p>
                         <div class="dark-mode-btn">
                             <label class="bb8-toggle">
@@ -103,12 +103,22 @@
                         </div>
                         <p>Dark</p>
                     </div>
+
+                    <form action="">
+
+                    </form>
                 </div>
 
                 <div class="user-settings-card">
                     <h2>Account <span class="danger">Support</span></h2>
-                    <div class="theme-preference">
-                        
+                    <div class="support-list">
+                        <ul>
+                            <li><a href="#">Help Center</a></li>
+                            <li><a href="#">Contact Support</a></li>
+                            <li><a href="#">Report a Problem</a></li>
+                            <li><a href="#">Security</a></li>
+                            <li><a href="#">Shipping and Delivery</a></li>
+                        </ul>
                     </div>
                 </div>
             </div>

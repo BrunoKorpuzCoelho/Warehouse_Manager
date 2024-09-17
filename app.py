@@ -38,6 +38,8 @@ class User(db.Model, UserMixin):
 
     product_movements = db.relationship('ProductMovements', back_populates='user', lazy=True)
     permissions = db.relationship("UserPermissions", uselist=False, back_populates="user")
+    logs = db.relationship('WorkSchedulesLogs', backref='user', lazy=True)
+    assigned_schedules = db.relationship('AssignedSchedules', backref='user_assigned_schedules', lazy=True)
 
     def __init__(self, username, password, nif, email, name, cellphone, role=None, last_login=None, status="Operational", user_type="Client"):
         self.username = username
@@ -257,11 +259,62 @@ class Notification(db.Model):
     user = db.relationship('User', backref='notifications')
     message = db.relationship('Message', backref='notifications')
 
+class WorkSchedules(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    schedule  = db.Column(db.String(5), unique = True)
+    time_in = db.Column(db.String(15))
+    time_out = db.Column(db.String(15))
+    lunch_start = db.Column(db.String(15))
+    lunch_end = db.Column(db.String(15))
+
+    logs = db.relationship('WorkSchedulesLogs', backref='work_schedule', lazy=True)
+
+    def __init__(self, schedule, time_in, time_out, lunch_start, lunch_end):
+        self.schedule = schedule
+        self.time_in = time_in
+        self.time_out = time_out
+        self.lunch_start = lunch_start
+        self.lunch_end = lunch_end
+
+class WorkSchedulesLogs(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    schedule_id = db.Column(db.Integer, db.ForeignKey('work_schedules.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
+    create_date_in = db.Column(db.String(30))
+    create_date_out = db.Column(db.String(30))
+    log_type = db.Column(db.String(10), default="Manual")
+    justification = db.Column(db.String)
+    status = db.Column(db.String(20), default="Approved")
+    notes = db.Column(db.String)
+
+    def __init__(self, schedule_id, user_id, create_date_out=None, log_type="Manual", justification="", status="Approved"):
+        self.schedule_id = schedule_id
+        self.user_id = user_id
+        self.create_date_in = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        self.create_date_out = create_date_out
+        self.log_type = log_type
+        self.justification = justification
+        self.status = status
+
+class AssignedSchedules(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    schedule_id = db.Column(db.Integer, db.ForeignKey('work_schedules.id'))
+    date = db.Column(db.String)
+
+    user = db.relationship('User', lazy=True)
+    schedule = db.relationship('WorkSchedules', backref='assigned_schedules', lazy=True)
+
+    def __init__(self, user_id, schedule_id, date):
+        self.user_id = user_id
+        self.schedule_id = schedule_id
+        self.date = date
+
 # Email configuration
 SMTP_SERVER = 'smtp-mail.outlook.com'
 SMTP_PORT = 587
-SMTP_EMAIL = "************************"
-SMTP_PASSWORD = "************************" 
+SMTP_EMAIL = "**********"
+SMTP_PASSWORD = "*******" 
 
 # Default Email Configuration
 def send_email(to_email, subject, body):
@@ -365,7 +418,7 @@ def login():
         password = request.form["password"]
 
         user = User.query.filter_by(username=username).first()
-        if user and user.password == password:
+        if user and check_password_hash(user.password, password):
             login_user(user)
             user.last_login = datetime.now().strftime('%d/%m/%Y %H:%M')
             db.session.commit()
@@ -595,7 +648,7 @@ def reset_password(user_id):
         flash("Password reset successfully. The new password has been sent to the user's email.", "success")
         
         send_password_reset_email(user, new_password)
-        print(f"{Fore.GREEN}Password reset successfully and email sent.")
+        print(f"{Fore.GREEN}Password reset successfully. . New password: {new_password} and email sent.")
     else:
         flash("User not found.", "danger")
 
@@ -670,10 +723,39 @@ def update_user_permissions(user_id):
 @login_required
 def user_settings(user_id):
      user = current_user if current_user.is_authenticated else None
+     user_to_edit = User.query.get(user_id)
+
      if request.method == "POST":
-         pass
+        if "name" in request.form and request.form["name"].strip() and request.form["name"] != user_to_edit.name:
+            user_to_edit.name = request.form["name"]
+
+        if "password" in request.form and request.form["password"].strip():
+            hashed_password = generate_password_hash(request.form["password"])
+            if not check_password_hash(user_to_edit.password, request.form["password"]):
+                user_to_edit.password = hashed_password
+
+        if "cellphone" in request.form and request.form["cellphone"].strip() and request.form["cellphone"] != user_to_edit.cellphone:
+            user_to_edit.cellphone = request.form["cellphone"]
+
+        if "email" in request.form and request.form["email"].strip() and request.form["email"] != user_to_edit.email:
+            user_to_edit.email = request.form["email"]
+        
+        db.session.commit()
+        flash("User details updated successfully.", "success")
+        print(f"{Fore.GREEN} User details updated successfully.")
+        return redirect(url_for("user_settings", user_id=user_id))
+
      else:
          return render_template("user_settings.html", user=user)
+     
+@app.route("/schedule", methods=["GET", "POST"])
+@login_required
+def schedule():
+    user = current_user if current_user.is_authenticated else None
+    if request.method == "POST":
+        pass
+    else:
+        return render_template("schedule_home.html", user=user)
 
 def create_user():
     user = User(username="test",
@@ -688,9 +770,59 @@ def create_user():
     db.session.commit()
     print(f"{Fore.GREEN}Criado Com sucesso")
 
+def create_work_schedules():
+    schedules = WorkSchedules(
+        schedule = "OFF",
+        time_in = "",
+        time_out = "",
+        lunch_start = "",
+        lunch_end = ""
+    )
+    db.session.add(schedules)
+    db.session.commit()
+    print(f"{Fore.GREEN}Criado Com sucesso")
+
+def assign_schedules_for_september(user_id=1):
+    start_date = datetime(2024, 9, 1)
+    end_date = datetime(2024, 9, 30)
+
+    week_schedule_a = 1  
+    week_schedule_b = 2  
+    weekend_off = 9      
+
+    current_date = start_date
+    week_counter = 0
+
+    while current_date <= end_date:
+        
+        if current_date.weekday() >= 5:  
+            schedule_id = weekend_off
+        else:
+            
+            if week_counter % 2 == 0:
+                schedule_id = week_schedule_a
+            else:
+                schedule_id = week_schedule_b
+
+        
+        date_str = current_date.strftime('%d/%m/%Y')
+
+        new_schedule = AssignedSchedules(user_id=user_id, schedule_id=schedule_id, date=date_str)
+        db.session.add(new_schedule)
+
+        current_date += timedelta(days=1)
+
+        if current_date.weekday() == 0:  
+            week_counter += 1
+
+    db.session.commit()
+    print("Horários atribuídos para o mês de setembro.")
+
 if __name__ == "__main__":
     init(autoreset=True)
     with app.app_context():
         db.create_all()
         #create_user()
-    app.run(host="0.0.0.0", port=5000, debug=True)
+        #create_work_schedules()
+        assign_schedules_for_september()
+    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)

@@ -38,3 +38,7 @@ const toggle = document.getElementById('darkModeToggle');
                 });
             }
         }
+
+        function redirectToSchedule() {
+            window.location.href = "/schedule";
+        }

@@ -62,9 +62,14 @@
                     </div>
                 </label>
             </div>
+
+            <div class="clock-in-out">
+                <button class="sing-out" onclick="redirectToSchedule()"><span class="material-symbols-outlined schedule">schedule</span>Shift Logging</button>
+            </div>
+
             {% if user %}
                 <form action="{{ url_for('logout') }}" method="post">
-                    <button type="submit">Sign out</button>
+                    <button type="submit" class="sing-out"><span class="material-symbols-outlined logout">logout</span>Sign out</button>
                 </form>
             {% endif %}
 
