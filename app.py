@@ -2,6 +2,7 @@ from flask import *
 from flask_login import *
 import os
 from flask_sqlalchemy import *
+from sqlalchemy import *
 from datetime import *
 import base64
 import smtplib
@@ -279,22 +280,24 @@ class WorkSchedules(db.Model):
 class WorkSchedulesLogs(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     schedule_id = db.Column(db.Integer, db.ForeignKey('work_schedules.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     create_date_in = db.Column(db.String(30))
-    create_date_out = db.Column(db.String(30))
     log_type = db.Column(db.String(10), default="Manual")
+    record_type = db.Column(db.String(10))
     justification = db.Column(db.String)
     status = db.Column(db.String(20), default="Approved")
     notes = db.Column(db.String)
 
-    def __init__(self, schedule_id, user_id, create_date_out=None, log_type="Manual", justification="", status="Approved"):
+    def __init__(self, schedule_id, user_id, create_date_in, notes, record_type, log_type="Manual", justification="", status="Approved"):
         self.schedule_id = schedule_id
         self.user_id = user_id
-        self.create_date_in = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
-        self.create_date_out = create_date_out
+        self.create_date_in = create_date_in
+        #datetime.now().strftime('%d/%m/%Y %H:%M:%S')
         self.log_type = log_type
         self.justification = justification
         self.status = status
+        self.record_type = record_type
+        self.notes = notes
 
 class AssignedSchedules(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -760,42 +763,241 @@ def user_settings(user_id):
 def schedule():
     user = current_user if current_user.is_authenticated else None
 
-    today = datetime.now().strftime('%d/%m/%Y') 
+    try:
+        today = datetime.now().strftime('%d/%m/%Y')
 
-    assigned_schedule = None
-    work_schedule = None
-    total_work_hours = None
-
-    assigned_schedule = AssignedSchedules.query.filter_by(user_id=user.id, date=today).first()
-
-    if assigned_schedule:
-        schedule_id = assigned_schedule.schedule_id
-        
-        work_schedule = WorkSchedules.query.filter_by(id=schedule_id).first()
-
-        if work_schedule:
-            time_in = datetime.strptime(work_schedule.time_in, "%H:%M")
-            time_out = datetime.strptime(work_schedule.time_out, "%H:%M")
-            lunch_start = datetime.strptime(work_schedule.lunch_start, "%H:%M") if work_schedule.lunch_start else None
-            lunch_end = datetime.strptime(work_schedule.lunch_end, "%H:%M") if work_schedule.lunch_end else None
-
-            total_work_time = time_out - time_in
-            
-            if lunch_start and lunch_end:
-                lunch_break_duration = lunch_end - lunch_start
-                total_work_time -= lunch_break_duration
-
-            total_work_hours = total_work_time.total_seconds() / 3600
-    else:
+        assigned_schedule = None
         work_schedule = None
-    
-    logs = WorkSchedulesLogs.query.filter_by(user_id=user.id).order_by(WorkSchedulesLogs.create_date_in.desc()).all()
+        total_work_hours = None
+        last_record_type = "Entry"  
+
+        # Tenta obter o assigned_schedule
+        assigned_schedule = AssignedSchedules.query.filter_by(user_id=user.id, date=today).first()
+
+        if assigned_schedule:
+            schedule_id = assigned_schedule.schedule_id
+            
+            # Tenta obter o work_schedule
+            work_schedule = WorkSchedules.query.filter_by(id=schedule_id).first()
+
+            if work_schedule:
+                if work_schedule.time_in != "OFF" and work_schedule.time_out != "OFF":
+                    time_in = datetime.strptime(work_schedule.time_in, "%H:%M")
+                    time_out = datetime.strptime(work_schedule.time_out, "%H:%M")
+                    lunch_start = datetime.strptime(work_schedule.lunch_start, "%H:%M") if work_schedule.lunch_start else None
+                    lunch_end = datetime.strptime(work_schedule.lunch_end, "%H:%M") if work_schedule.lunch_end else None
+
+                    total_work_time = time_out - time_in
+                    
+                    if lunch_start and lunch_end:
+                        lunch_break_duration = lunch_end - lunch_start
+                        total_work_time -= lunch_break_duration
+
+                    total_work_hours = total_work_time.total_seconds() / 3600
+                else:
+                    total_work_hours = 0
+
+                last_log = WorkSchedulesLogs.query.filter_by(user_id=user.id).order_by(WorkSchedulesLogs.create_date_in.desc()).first()
+                last_record_type = last_log.record_type if last_log else "Out"
+
+                logs = WorkSchedulesLogs.query.filter_by(user_id=user.id).all()
+
+                def convert_to_datetime(log):
+                    return datetime.strptime(log.create_date_in, '%d/%m/%Y %H:%M:%S')
+
+                logs = sorted(logs, key=convert_to_datetime, reverse=True)  
+            else:
+                flash("Work schedule not found.", "danger")
+                logs = []
+        else:
+            flash("No assigned schedule for today.", "warning")
+            logs = []
+
+    except AttributeError as e:
+        flash(f"An error occurred: {str(e)}", "danger")
+        logs = []
+        work_schedule = None
+
+    except Exception as ex:
+        flash(f"An unexpected error occurred: {str(ex)}", "danger")
+        logs = []
+        work_schedule = None
 
     if request.method == "POST":
-        pass
-    else:
-        return render_template("schedule_home.html", user=user, work_schedule=work_schedule, total_work_hours=total_work_hours, logs=logs)
+        try:
+            log_type = request.form.get("log_type") 
+            date_input = request.form.get("date")    
+            time_input = request.form.get("time")    
+            record_type = request.form.get("record_type")  
+            justification = request.form.get("justification")
 
+            if not record_type:
+                last_log = WorkSchedulesLogs.query.filter_by(user_id=user.id).order_by(WorkSchedulesLogs.create_date_in.desc()).first()
+                if last_log and last_log.record_type == "Entry":
+                    record_type = "Out"
+                else:
+                    record_type = "Entry"
+
+            if log_type == "on":  
+                create_date_in = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+
+                new_log = WorkSchedulesLogs(
+                    schedule_id=assigned_schedule.schedule_id,
+                    user_id=user.id,
+                    create_date_in=create_date_in,
+                    record_type=record_type,
+                    log_type="Automatic",  
+                    status="Approved",  
+                    justification="",  
+                    notes=""
+                )
+                db.session.add(new_log)
+                db.session.commit()
+                flash("Automatic time stamp added successfully!", "success")
+                print(f"{Fore.GREEN}Automatic time stamp added successfully!")
+            else:  
+                if date_input and time_input:  
+                    datetime_input = datetime.strptime(f"{date_input} {time_input}", '%Y-%m-%d %H:%M')  
+                    create_date_in = datetime_input.strftime('%d/%m/%Y %H:%M:%S')  
+
+                    new_log = WorkSchedulesLogs(
+                        schedule_id=assigned_schedule.schedule_id,
+                        user_id=user.id,
+                        create_date_in=create_date_in,
+                        record_type=record_type,
+                        log_type="Manual",  
+                        status="Pending",  
+                        justification=justification, 
+                        notes=""
+                    )
+                    db.session.add(new_log)
+                    db.session.commit()
+                    flash("Manual time stamp added successfully!", "success")
+                    print(f"{Fore.GREEN}Manual time stamp added successfully!")
+                else:
+                    flash("Error: Date and time not provided for manual recording.", "danger")
+                    print(f"{Fore.RED}Error: Date and time not provided for manual recording.")
+                    
+        except Exception as e:
+            flash(f"An error occurred while adding the log: {str(e)}", "danger")
+            print(f"{Fore.RED}Error: {str(e)}")
+
+        return redirect(url_for("schedule"))
+    
+    return render_template("schedule_home.html", user=user, work_schedule=work_schedule, total_work_hours=total_work_hours, logs=logs, last_record_type=last_record_type)   
+@app.route("/schedule-manager", methods=["GET", "POST"])
+@login_required
+def schedule_manager():
+    user = current_user if current_user.is_authenticated else None
+
+    if user.user_type in ["Admin", "Manager"]:
+        schedules_log_query = db.session.query(WorkSchedulesLogs, User.name).join(User, WorkSchedulesLogs.user_id == User.id).filter(
+            and_(
+                WorkSchedulesLogs.log_type == "Manual", 
+                WorkSchedulesLogs.status != "Approved", 
+                WorkSchedulesLogs.status != "Rejected"
+            )
+        )
+
+        if request.method == "POST":
+            name = request.form.get("name")
+            record_type = request.form.get("record_type")
+
+            if name:
+                schedules_log_query = schedules_log_query.filter(User.name.ilike(f"%{name}%"))
+
+            if record_type and record_type != 'all':
+                schedules_log_query = schedules_log_query.filter(WorkSchedulesLogs.record_type == record_type)
+
+        schedules_log = schedules_log_query.all()
+
+        return render_template("schedule_manager.html", user=user, schedules_log=schedules_log)
+    else:
+        return render_template("no_permission_page.html", user=user)
+
+@app.route("/approve-log/<int:log_id>", methods=["POST"])
+@login_required
+def approve_log(log_id):
+    user = current_user if current_user.is_authenticated else None
+
+    if user.user_type in ["Admin", "Manager"]:
+        log_entry = WorkSchedulesLogs.query.get(log_id)
+        
+        if log_entry:
+            log_entry.status = "Approved"
+            db.session.commit()
+            print(f"{Fore.GREEN}Log approved successfully!")
+            flash("Log approved successfully!", "success")
+        else:
+            print(f"{Fore.RED}Log approved successfully!")
+            flash("Log not found.", "danger")
+
+        return redirect(url_for("schedule_manager"))
+    else:
+        return render_template("no_permission_page.html", user=user)
+
+@app.route("/reject-log/<int:log_id>", methods=["POST"])
+@login_required
+def reject_log(log_id):
+    user = current_user if current_user.is_authenticated else None
+
+    if user.user_type in ["Admin", "Manager"]:
+        log_entry = WorkSchedulesLogs.query.get(log_id)
+        
+        if log_entry:
+            # Recebe a nota de rejeição do formulário
+            notes = request.form.get("notes")
+            log_entry.status = "Rejected"
+            log_entry.notes = notes
+            db.session.commit()
+            print(f"{Fore.GREEN}Log rejected successfully!")
+            flash("Log rejected successfully!", "success")
+        else:
+            print(f"{Fore.RED}Log not found.")
+            flash("Log not found.", "danger")
+
+        return redirect(url_for("schedule_manager"))
+    else:
+        return render_template("no_permission_page.html", user=user)
+
+
+@app.route("/approve-all-logs", methods=["POST"])
+@login_required
+def approve_all_logs():
+    logs_to_approve = WorkSchedulesLogs.query.filter(WorkSchedulesLogs.status == 'Pending').all()
+
+    for log in logs_to_approve:
+        log.status = 'Approved'
+    
+    db.session.commit()
+    print(f"{Fore.GREEN}All pending logs have been approved!")
+    flash("All pending logs have been approved!", "success")
+
+    return redirect(url_for('schedule_manager'))
+
+@app.route("/reject-all-logs", methods=["POST"])
+@login_required
+def reject_all_logs():
+    notes = request.form.get('notes')
+
+    logs_to_reject = WorkSchedulesLogs.query.filter(WorkSchedulesLogs.status == 'Pending').all()
+
+    for log in logs_to_reject:
+        log.status = 'Rejected'
+        log.notes = notes  
+    
+    db.session.commit()
+    print(f"{Fore.GREEN}All pending logs have been rejected!")
+    flash("All pending logs have been rejected!", "danger")
+
+    return redirect(url_for('schedule_manager'))
+
+@app.route("/schedules-all-records", methods=["POST", "GET"])
+@login_required
+def all_schedules_records():
+    
+
+"---------------------------------------------------------------------------------------------------------------------"
 def create_user():
     user = User(username="test",
                 password="teste",
@@ -821,7 +1023,7 @@ def create_work_schedules():
     db.session.commit()
     print(f"{Fore.GREEN}Criado Com sucesso")
 
-def assign_schedules_for_september(user_id=1):
+def assign_schedules_for_september(user_id=3):
     start_date = datetime(2024, 9, 1)
     end_date = datetime(2024, 9, 30)
 

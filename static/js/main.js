@@ -42,3 +42,33 @@ const toggle = document.getElementById('darkModeToggle');
         function redirectToSchedule() {
             window.location.href = "/schedule";
         }
+
+        function promptRejection(logId) {
+            const notes = window.prompt("Please enter the reason for rejection:");
+    
+            if (notes !== null && notes.trim() !== "") {
+                document.getElementById('notes-' + logId).value = notes;
+                document.getElementById('reject-form-' + logId).submit();
+            } else {
+                alert("Rejection canceled or no reason provided.");
+            }
+        }
+
+        function approveAll() {
+            if (confirm("Are you sure you want to approve all logs?")) {
+                document.getElementById('approve-all-form').submit();
+            }
+        }
+    
+        function confirmRejectAll() {
+            var reason = prompt("Please provide the reason for rejecting all logs:");
+            
+            if (reason === null || reason === "") {
+                alert("Rejection cancelled or no reason provided.");
+                return;
+            }
+            
+            document.getElementById('reject-all-notes').value = reason;
+            
+            document.getElementById('reject-all-form').submit();
+        }

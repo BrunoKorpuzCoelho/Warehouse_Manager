@@ -104,9 +104,7 @@
                             <div class="numbers-statics">
                                 <h2 class="number-of-users">10</h2>
                             </div>
-                            {% if user.user_type == "Admin" or user.user_type == "Manager" %}
                             <a href="{{ url_for('user_settings', user_id=user.id) }}" class="btn-shine">Manage Settings</a>
-                            {% endif %}
                         </div>
 
                         <p class="users-card-final-p">User management settings configured</p>
