@@ -43,8 +43,9 @@
             <div class="user-manager-container">
                 <div class="side-menu">
                     <a href="/dashboard" title="Dashboard"><span class="material-symbols-outlined home">widgets</span></a>
-                    <a href="/schedule" class="active active-users" title="Schedule"><span class="material-symbols-outlined users">calendar_month</span></a>
+                    <a href="/schedule" class="active active-users" title="Schedule"><span class="material-symbols-outlined users">schedule</span></a>
                     <a href="/schedule-manager" title="Schedule Manager"><span class="material-symbols-outlined warehouse">calendar_add_on</span></a>
+                    <a href="/schedules-all-records" title="Schedule Record"><span class="material-symbols-outlined inventory">calendar_month</span></a>
                     <a href="" title="Messages" class="messages-a"><span class="material-symbols-outlined mail">mail</span><span class="mesage-count">10</span></a>
                     <a href="" title="Settings"><span class="material-symbols-outlined settings">manufacturing</span></a>
                     <a href="#" onclick="document.getElementById('logout-form').submit();" title="Logout"><span class="material-symbols-outlined users">logout</span></a>
@@ -144,7 +145,7 @@
                                         {% endif %}
                                     </tbody>
                                 </table>
-                                <a href="" class="table-more-info-a">show more schedule info</a>
+                                <a href="#" class="table-more-info-a">show more schedule info</a>
                             </div>
                         </div>
                     </div>
@@ -178,7 +179,7 @@
                                 {% endfor %}
                             </tbody>
                         </table>      
-                        <a href="" class="table-more-info-a">Show more records history</a>                  
+                        <a href="/schedules-all-records" class="table-more-info-a">Show more records history</a>                  
                     </div>
                 </div>
             </div>

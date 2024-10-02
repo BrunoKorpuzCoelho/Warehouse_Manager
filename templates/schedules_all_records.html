@@ -26,68 +26,95 @@
     </form>
     <!-- End of Form for Logout -->
 
+    <!-- Loader -->
+    <div class="🤚">
+        <div class="👉"></div>
+        <div class="👉"></div>
+        <div class="👉"></div>
+        <div class="👉"></div>
+        <div class="🌴"></div>		
+        <div class="👍"></div>
+    </div>
+    <!-- End of Loader -->
+
     <!-- Main Menu -->
-     <main>
+     <main class="main-content" style="display: none;">
             <div class="user-manager-container">
                 <div class="side-menu">
                     <a href="/dashboard" title="Dashboard"><span class="material-symbols-outlined home">widgets</span></a>
-                    <a href="/schedule" class="active active-users" title="Schedule"><span class="material-symbols-outlined users">calendar_month</span></a>
+                    <a href="/schedule"  title="Schedule"><span class="material-symbols-outlined users">schedule</span></a>
                     <a href="/schedule-manager" title="Schedule Manager"><span class="material-symbols-outlined warehouse">calendar_add_on</span></a>
+                    <a href="/schedules-all-records" title="Schedule Record" class="active active-inventory"><span class="material-symbols-outlined inventory">calendar_month</span></a>
                     <a href="" title="Messages" class="messages-a"><span class="material-symbols-outlined mail">mail</span><span class="mesage-count">10</span></a>
                     <a href="" title="Settings"><span class="material-symbols-outlined settings">manufacturing</span></a>
                     <a href="#" onclick="document.getElementById('logout-form').submit();" title="Logout"><span class="material-symbols-outlined users">logout</span></a>
                 </div>
 
-                <div class="schedule-header">
-                    <h3>{{ user.name }}</h3>
-                </div>
+                <div class="schedule-manager-container">
+                    <div class="schedule-manager-wrap">
+                        <div class="schedule-manager-header">
+                            <form id="filter-form">
+                                <label for="record_type">Record Type:</label>
+                                <select name="record_type" id="filter-record-type">
+                                    <option value="all">All Records</option>
+                                    <option value="Entry">Entry</option>
+                                    <option value="Out">Out</option>
+                                </select>
+                        
+                                <label for="status">Status Type:</label>
+                                <select name="status" id="filter-status">
+                                    <option value="all">All Records</option>
+                                    <option value="Approved">Approved</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Rejected">Rejected</option>
+                                </select>
+                        
+                                <label for="log_type">Log Type:</label>
+                                <select name="log_type" id="filter-log-type">
+                                    <option value="all">All Records</option>
+                                    <option value="Automatic">Automatic</option>
+                                    <option value="Manual">Manual</option>
+                                </select>
+                        
+                                <button type="button" class="btn-shine schedule-manager-search-btn" onclick="applyFilters()">Search</button>
+                            </form>
+                        </div> 
+                    </div>
 
-                
+                    <div class="search-schedule-manager-container">
+                        <table class="work-shift-table schedule-search-table">
+                            <thead>
+                                <tr>
+                                    <th>Record ID</th>
+                                    <th>Record Date and Time</th>
+                                    <th>Record Type</th>
+                                    <th>Status</th>
+                                    <th>Log Type</th>
+                                    <th>Justification</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="schedule-records">
+                                {% for log in logs %}
+                                <tr>
+                                    <td>{{ log.id }}</td>
+                                    <td>{{ log.create_date_in }}</td>
+                                    <td class="record-type">{{ log.record_type }}</td>
+                                    <td class="status">{{ log.status }}</td>
+                                    <td class="log-type">{{ log.log_type }}</td>
+                                    <td>{{ log.justification }}</td>
+                                    <td>{{ log.notes }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
      </main>
-     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const logTypeCheckbox = document.getElementById('log_type');
-            const recordTypeSelect = document.getElementById('record_type');
-            const dateInput = document.getElementById('date');
-            const timeInput = document.getElementById('time');
-            const justificationTextarea = document.getElementById('justification');
-    
-            function setDateTimeToNow() {
-                const now = new Date();
-                dateInput.value = now.toISOString().split('T')[0]; 
-                timeInput.value = now.toTimeString().slice(0, 5);    
-            }
-    
-            function toggleRecordType(disable) {
-                recordTypeSelect.disabled = disable;
-            }
-    
-            if (logTypeCheckbox.checked) {
-                setDateTimeToNow();
-                dateInput.disabled = true;  
-                timeInput.disabled = true;
-                justificationTextarea.disabled = true;
-                toggleRecordType(true); 
-            }
-    
-            logTypeCheckbox.addEventListener('change', function () {
-                if (this.checked) {
-                    setDateTimeToNow();
-                    dateInput.disabled = true; 
-                    timeInput.disabled = true;
-                    justificationTextarea.disabled = true;
-                    toggleRecordType(true); 
-                } else {
-                    dateInput.disabled = false;  
-                    timeInput.disabled = false;
-                    justificationTextarea.disabled = false;
-                    toggleRecordType(false); 
-                }
-            });
-        });
-    </script>
+     <script src="/static/js/loader.js"></script>
     <script src="/static/js/main.js"></script>
+    <script src="/static/js/search_schedule.js"></script>
 </body>
 </html>

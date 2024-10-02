@@ -12,6 +12,10 @@ import random
 from werkzeug.security import *
 import secrets
 from colorama import *
+from random import *
+import random
+import qrcode
+from io import *
 
 # App config
 app = Flask(__name__)
@@ -41,6 +45,7 @@ class User(db.Model, UserMixin):
     permissions = db.relationship("UserPermissions", uselist=False, back_populates="user")
     logs = db.relationship('WorkSchedulesLogs', backref='user', lazy=True)
     assigned_schedules = db.relationship('AssignedSchedules', backref='user_assigned_schedules', lazy=True)
+    sales = db.relationship('Sales', back_populates='user', lazy=True)
 
     def __init__(self, username, password, nif, email, name, cellphone, role=None, last_login=None, status="Operational", user_type="Client"):
         self.username = username
@@ -104,15 +109,16 @@ class Product(db.Model):
     min_recommended_stock = db.Column(db.Integer)
     create_date = db.Column(db.String(20))
     last_update = db.Column(db.String(14))
-    warehouse_section = db.Column(db.Integer)
+    warehouse_section = db.Column(db.String)
     warehouse_shelf = db.Column(db.Integer)
     status = db.Column(db.String(20), default="Active")
     update_info = db.Column(db.String(20))
 
     product_movements = db.relationship('ProductMovements', back_populates='product', lazy=True)
     order_items = db.relationship('OrderItem', back_populates='product', lazy=True)
+    sales = db.relationship('Sales', back_populates='product', lazy=True)
 
-    def __init__(self, ref, qr_code_path, name, product_type, brand, model, buy_price, sell_price, margin, stock, min_recommended_stock, last_update, update_info, status="Active"):
+    def __init__(self, ref, qr_code_path, name, product_type, brand, model, buy_price, sell_price, margin, stock, min_recommended_stock, last_update, update_info, warehouse_section, warehouse_shelf, status="Active"):
         self.ref = ref
         self.qr_code_path = qr_code_path
         self.name = name.upper()
@@ -128,6 +134,8 @@ class Product(db.Model):
         self.last_update = last_update
         self.status = status.capitalize()
         self.update_info = update_info
+        self.warehouse_section = warehouse_section
+        self.warehouse_shelf = warehouse_shelf
 
 class ProductMovements(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -308,7 +316,7 @@ class AssignedSchedules(db.Model):
     is_active = db.Column(db.Boolean, default=False)
     previous_schedule_id = db.Column(db.Integer, db.ForeignKey('assigned_schedules.id'))
 
-    user = db.relationship('User', lazy=True)
+    user = db.relationship('User', lazy=True, overlaps="assigned_schedules,user_assigned_schedules")
     schedule = db.relationship('WorkSchedules', backref='assigned_schedules', lazy=True)
     previous_schedule = db.relationship('AssignedSchedules', remote_side=[id], backref='replaced_by')
 
@@ -319,6 +327,40 @@ class AssignedSchedules(db.Model):
         self.status = status
         self.is_active = is_active
         self.previous_schedule_id = previous_schedule_id
+
+class Sales(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    customer_name = db.Column(db.String(100))
+    quantity_sold = db.Column(db.Integer)
+    create_date = db.Column(db.String(20))
+    status = db.Column(db.String(20), default="Completed")
+    
+    product = db.relationship('Product', back_populates='sales')
+    user = db.relationship('User', back_populates='sales') 
+    
+    def __init__(self, product_id, quantity_sold, user_id=None, customer_name=None, status="Completed"):
+        self.product_id = product_id
+        self.quantity_sold = quantity_sold
+        self.create_date = datetime.now().strftime('%d/%m/%Y %H:%M') 
+        self.user_id = user_id
+        self.customer_name = customer_name
+        self.status = status
+
+class Brands(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    brand_name = db.Column(db.String, unique=True)
+
+    def __init__(self, brand_name):
+        self.brand_name = brand_name
+
+class ProductTypes(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    product_type = db.Column(db.String, unique=True)
+
+    def __init__(self, product_type):
+        self.product_type = product_type
 
 # Email configuration
 SMTP_SERVER = 'smtp-mail.outlook.com'
@@ -507,6 +549,11 @@ def user_manager():
 @app.route("/manager-new-user", methods=["GET", "POST"])
 @login_required
 def manager_new_user():
+    user = current_user if current_user.is_authenticated else None
+
+    if not user.permissions.can_create_new_users :
+        return render_template("no_permission_page.html", user=user)
+    
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
@@ -571,18 +618,23 @@ def manager_new_user():
         return redirect(url_for("user_manager"))
 
     else:
-        user = current_user if current_user.is_authenticated else None
         return render_template("manager_new_user_register.html",  user=user)
     
 @app.route("/reactivate-users", methods = ["POST", "GET"])
 @login_required
 def reactivate_users():
+    user = current_user if current_user.is_authenticated else None
+
+    if not user.permissions.can_manage_user_permissions:
+        return render_template("no_permission_page.html", user=user)
+    
     if request.method == "POST":
-        pass
+        user_name = request.form.get("user_name")
+        all_users = User.query.filter(User.name.ilike(f"%{user_name}%")).all()
+        return render_template("reactivate.html", user=user, all_users=all_users)
     else:
         all_users = User.query.all()
 
-        user = current_user if current_user.is_authenticated else None
         return render_template("reactivate.html", user=user, all_users=all_users)
     
 @app.route('/change-user-status/<int:user_id>/<new_status>', methods=['POST'])
@@ -679,8 +731,11 @@ def all_users_page():
 @login_required
 def change_user_permissions():
     user = current_user if current_user.is_authenticated else None
-    if user.user_type == "Admin" or user.user_type == "Manager":
-        if request.method == "POST":
+
+    if not user.permissions.can_manage_user_permissions:
+        return render_template("no_permission_page.html", user=user)
+    
+    if request.method == "POST":
             search_term = request.form.get("search_term", "").strip()
             search_results = User.query.filter(User.nif.contains(search_term)).all()
             if search_results:
@@ -688,11 +743,8 @@ def change_user_permissions():
             else:
                 user_permissions = None
             return render_template("change_permissions.html", user=user, search_results=search_results, user_permissions=user_permissions)
-        else:
-            return render_template("change_permissions.html", user=user)
     else:
-        print(f"{Fore.RED}The user type is not supported for this page.")
-        return "Access Denied", 403
+        return render_template("change_permissions.html", user=user)
 
 @app.route('/update-permissions/<int:user_id>', methods=['POST'])
 @login_required
@@ -771,13 +823,11 @@ def schedule():
         total_work_hours = None
         last_record_type = "Entry"  
 
-        # Tenta obter o assigned_schedule
         assigned_schedule = AssignedSchedules.query.filter_by(user_id=user.id, date=today).first()
 
         if assigned_schedule:
             schedule_id = assigned_schedule.schedule_id
             
-            # Tenta obter o work_schedule
             work_schedule = WorkSchedules.query.filter_by(id=schedule_id).first()
 
             if work_schedule:
@@ -945,7 +995,6 @@ def reject_log(log_id):
         log_entry = WorkSchedulesLogs.query.get(log_id)
         
         if log_entry:
-            # Recebe a nota de rejeição do formulário
             notes = request.form.get("notes")
             log_entry.status = "Rejected"
             log_entry.notes = notes
@@ -992,20 +1041,135 @@ def reject_all_logs():
 
     return redirect(url_for('schedule_manager'))
 
-@app.route("/schedules-all-records", methods=["POST", "GET"])
+@app.route("/schedules-all-records", methods=["GET"])
 @login_required
 def all_schedules_records():
-    
+    user = current_user  
 
-"---------------------------------------------------------------------------------------------------------------------"
+    logs = WorkSchedulesLogs.query.filter_by(user_id=user.id).order_by(desc(WorkSchedulesLogs.create_date_in)).all()
+    
+    return render_template("schedules_all_records.html", user=user, logs=logs)
+
+@app.route("/products-manager", methods = ["GET", "POST"])
+@login_required
+def products_manager():
+    user = current_user if current_user.is_authenticated else None
+
+    last_product = Product.query.order_by(Product.id.desc()).first()
+    last_product_id = last_product.id if last_product else 0
+    deactivated_products_count = 0
+    all_products = Product.query.all()
+    last_supplier = Suppliers.query.order_by(Suppliers.id.desc()).first()
+    last_supplier_id = last_supplier.id if last_supplier else 0
+    out_of_stock_products_count = Product.query.filter(Product.stock == 0).count()
+
+    for p in all_products:
+            if p.status == 'Inactive':
+                deactivated_products_count += 1
+
+    best_selling_products = db.session.query(Product.name, db.func.sum(Sales.quantity_sold).label('total_sales'),db.func.sum((Product.sell_price - Product.buy_price) * Sales.quantity_sold).label('total_profit')).join(Sales, Product.id == Sales.product_id).group_by(Product.id).order_by(db.func.sum(Sales.quantity_sold).desc()).limit(10).all()
+
+    return render_template("products_manager.html", user=user, last_product_id=last_product_id, deactivated_products_count=deactivated_products_count, last_supplier_id=last_supplier_id, best_selling_products=best_selling_products, out_of_stock_products_count=out_of_stock_products_count)
+
+@app.route("/create-new-product", methods=["POST", "GET"])
+@login_required
+def create_new_product():
+    user = current_user if current_user.is_authenticated else None
+    if user.user_type == "Admin" or user.user_type == "Manager":
+        brand = request.form.get("brand")
+        name = request.form.get("name")
+        product_type = request.form.get("product_type")
+        buy_price = request.form.get("buy_price")
+        margin = request.form.get("margin")
+        min_recommended_stock = request.form.get("min_recommended_stock")
+        warehouse_section = request.form.get("warehouse_section")
+        warehouse_shelf = request.form.get("warehouse_shelf")
+
+        if request.method == "POST":
+            sell_price = buy_price + (buy_price * margin / 100)
+            
+            new_product = Product(
+                brand = brand,
+                # Continuar a criar a criação dos dados para inserir na base de dados
+            )
+        else:
+            return render_template("create_new_product.html", user=user)
+    else:
+        return render_template("no_permission_page.html", user=user)
+    
+@app.route("/get_brands", methods=["GET"])
+def get_brands():
+    brands = Brands.query.all() 
+    brands_list = [{"id": brand.id, "name": brand.brand_name} for brand in brands]
+    return jsonify(brands_list)
+
+@app.route("/get-product-type", methods=["GET"])
+def get_product_types():
+    product_types = ProductTypes.query.all() 
+    product_type_list = [{"id": t.id, "name": t.product_type} for t in product_types]
+    return jsonify(product_type_list)
+
+@app.route("/product-page/<int:product_id>", methods=["GET"])
+def product_page(product_id):
+    product = Product.query.filter_by(id=product_id).first()
+    
+    if not product:
+        flash("Product not found.", "danger")
+        print(f"{Fore.RED} Product not found.")
+        return render_template("no_product_page.html")
+
+    return render_template("product_page.html", product=product)
+
+@app.route("/all-products", methods=["GET", "POST"])
+@login_required
+def all_products():
+    user = current_user if current_user.is_authenticated else None
+    all_products = Product.query.all()
+    
+    if request.method == "POST":
+        pass
+    else:
+        return render_template("all_products_page.html", user=user, all_products=all_products)
+    
+@app.route("/generate_qr_code/<int:product_id>")
+def generate_qr_code(product_id):
+    product = db.session.get(Product, product_id)
+    
+    if not product or not product.qr_code_path:
+        return "Product or QR Code path not found", 404
+    
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(product.qr_code_path)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill='black', back_color='white')
+    
+    img_io = BytesIO()
+    img.save(img_io, 'PNG')
+    img_io.seek(0)
+
+    return send_file(img_io, mimetype='image/png')
+
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------
+
 def create_user():
-    user = User(username="test",
-                password="teste",
+    user = User(username="adhasdasihdaoisasdasdasdasdasdadadadsadd",
+                password="test",
                 user_type="Employee",
-                nif = "784512547",
-                email = "employee@example.com",
-                name = "Darlin Vieira",
-                cellphone = "941124478"
+                nif = "784512547a",
+                email = "employeeeee@example.com",
+                name = "Marcooo Vieira",
+                cellphone = "9411244615678"
                 )
     db.session.add(user)
     db.session.commit()
@@ -1024,8 +1188,8 @@ def create_work_schedules():
     print(f"{Fore.GREEN}Criado Com sucesso")
 
 def assign_schedules_for_september(user_id=3):
-    start_date = datetime(2024, 9, 1)
-    end_date = datetime(2024, 9, 30)
+    start_date = datetime(2024, 10, 1)
+    end_date = datetime(2024, 10, 31)
 
     week_schedule_a = 1  
     week_schedule_b = 2  
@@ -1066,6 +1230,177 @@ def assign_schedules_for_september(user_id=3):
     db.session.commit()
     print("Horários atribuídos para o mês de setembro.")
 
+def creat_product():
+    margin = 120  
+    buy_price = 745.47
+
+    sell_price = buy_price + (buy_price * margin / 100)
+
+    new_product = Product(
+        ref = "SPR54791349",
+        qr_code_path = "teste3",
+        name = "Brake Clean 200L",
+        product_type = "Produtos Químicos",
+        brand = "Facon",
+        model = "None",
+        buy_price = buy_price,
+        sell_price = sell_price,
+        margin = margin,
+        stock = 3,
+        min_recommended_stock = 5,
+        last_update = "",
+        warehouse_section = "D",
+        warehouse_shelf = 1,
+        status = "Active",
+        update_info = datetime.now().strftime('%d/%m/%Y %H:%M')
+    )
+
+    db.session.add(new_product)
+    db.session.commit()
+    print(f"{Fore.GREEN}Criado Com sucesso")
+
+def create_test_supplier():
+    new_supplier = Suppliers(
+        supplier_name="Teste Supplier",
+        contact_name="John Doe",
+        contact_email="john.doe@test.com",
+        contact_phone="+351912345678",
+        type="Alimentar",
+        country="Portugal",
+        adress="1234 Test Avenue, Lisbon",
+        payment_terms="Net 30",
+        credit_limit=10000,
+        last_order_date=datetime.now().strftime('%d/%m/%Y'),
+        rating=5
+    )
+    
+    db.session.add(new_supplier)
+    db.session.commit()
+
+    print(f"{Fore.GREEN}Fornecedor {new_supplier.supplier_name} criado com sucesso!")
+
+def create_sales_entries():
+    customers = ["John Doe", "Jane Smith", "Michael Johnson", "Emily Davis", "Chris Brown"]
+    
+    product_ids = [1, 2,3]
+    user_ids = [1, 2]  
+    
+    for _ in range(20):
+        product_id = choice(product_ids)
+        user_id = choice(user_ids)
+        customer_name = choice(customers) 
+        quantity_sold = randint(1, 30) 
+        
+        new_sale = Sales(
+            product_id=product_id,
+            quantity_sold=quantity_sold,
+            user_id=user_id,
+            customer_name=customer_name,
+            status="Completed"
+        )
+        
+        db.session.add(new_sale)
+    db.session.commit()
+    print("Vendas criadas com sucesso!")
+
+def create_brands():
+    brands = [
+        "Falcon", "Facon", "Bosch", "Philips", "Samsung", "Sharp", "Kenmore", "Electrolux", "KitchenAid", "Whirlpool",
+        "Sony", "LG", "Panasonic", "GE Appliances", "Frigidaire", "Miele", "Maytag", "Sub-Zero", "Viking", "Thermador",
+        "Siemens", "Beko", "Haier", "Hitachi", "Liebherr", "Gorenje", "Smeg", "Zanussi", "Fisher & Paykel", "DeLonghi",
+        "Braun", "Rowenta", "Tefal", "Krups", "Russell Hobbs", "Morphy Richards", "Dyson", "Hoover", "Bissell", "Shark",
+        "Makita", "DeWalt", "Black & Decker", "Craftsman", "Ryobi", "Milwaukee", "Hitachi Tools", "Hilti", "Bosch Tools",
+        "Karcher", "Stanley", "Metabo", "Ridgid", "Skil", "Worx", "Dremel", "Festool", "Porter-Cable", "Husqvarna",
+        "Honda", "Yamaha", "Kawasaki", "Suzuki", "Harley-Davidson", "Ducati", "BMW", "Mercedes-Benz", "Audi", "Volkswagen",
+        "Porsche", "Ford", "Chevrolet", "Cadillac", "Buick", "Jeep", "Tesla", "Nissan", "Toyota", "Subaru", "Mitsubishi",
+        "Hyundai", "Kia", "Mazda", "Volvo", "Land Rover", "Jaguar", "Peugeot", "Renault", "Citroen", "Fiat", "Alfa Romeo",
+        "Ferrari", "Lamborghini", "Bugatti", "Maserati", "McLaren", "Aston Martin", "Rolls-Royce", "Bentley", "Pagani",
+        "Hugo Boss", "Gucci", "Prada", "Versace", "Armani", "Ralph Lauren", "Calvin Klein", "Tommy Hilfiger", "Nike", "Adidas",
+        "Puma", "Reebok", "Under Armour", "New Balance", "Fila", "Converse", "Vans", "Levi's", "Wrangler", "Diesel",
+        "Gap", "Zara", "H&M", "Uniqlo", "Benetton", "Burberry", "Givenchy", "Yves Saint Laurent", "Hermes", "Chanel",
+        "Louis Vuitton", "Balenciaga", "Fendi", "Valentino", "Dolce & Gabbana", "Alexander McQueen", "Celine", "Christian Dior",
+        "Rolex", "Omega", "Tag Heuer", "Breitling", "Patek Philippe", "Audemars Piguet", "Vacheron Constantin", "Seiko",
+        "Citizen", "Casio", "Swatch", "Fossil", "Michael Kors", "Tissot", "Longines", "Hublot", "Panerai", "IWC", "Chopard",
+        "Cartier", "Montblanc", "Bvlgari", "Tiffany & Co.", "Ray-Ban", "Oakley", "Persol", "Maui Jim", "Tom Ford",
+        "Warby Parker", "Bose", "JBL", "Sennheiser", "Beats by Dre", "Sony Audio", "Bang & Olufsen", "Klipsch", "Pioneer",
+        "Harman Kardon", "Denon", "Marantz", "Onkyo", "Yamaha Audio", "Focal", "KEF", "Bowers & Wilkins", "Polk Audio",
+        "Logitech", "Corsair", "Razer", "SteelSeries", "HyperX", "Alienware", "MSI", "Asus", "Acer", "Dell", "HP",
+        "Lenovo", "Toshiba", "Apple", "Microsoft", "Google", "Amazon", "Intel", "AMD", "NVIDIA", "Seagate", "Western Digital",
+        "Sandisk", "Kingston", "Crucial", "Corsair Memory", "G.SKILL", "Samsung SSD", "Sony PlayStation", "Microsoft Xbox",
+        "Nintendo", "Logitech Gaming", "Thrustmaster", "Roccat", "Cooler Master", "EVGA", "Zotac", "ASRock", "Gigabyte",
+        "Biostar", "HP Enterprise", "Synology", "QNAP", "Netgear", "TP-Link", "Cisco", "Ubiquiti", "D-Link", "Linksys",
+        "Huawei", "Xiaomi", "OnePlus", "Oppo", "Realme", "Vivo", "Honor", "ZTE", "Sony Mobile", "Nokia", "BlackBerry",
+        "Motorola", "HTC", "Palm", "LG Mobile", "Lenovo Mobile", "Alcatel", "Micromax", "Blu", "Infinix", "Tecno",
+        "Itel", "Gionee", "Lava", "Coolpad", "Meizu", "Vernee", "LeEco", "Doogee", "Cubot", "UMIDIGI", "Oukitel",
+        "CAT", "Kyocera", "Sonim", "Fairphone", "Jolla", "Turing", "Yota", "Kogan", "Google Pixel", "Asus ROG Phone",
+        "Nubia", "Redmi", "Honor Magic", "Realme Narzo", "Poco", "iQOO", "Vivo Nex", "Oppo Find", "Xiaomi Mi",
+        "Xiaomi Redmi", "Xiaomi Black Shark", "OnePlus Nord", "Sony Xperia", "Sharp Aquos", "TCL", "Hisense", "Panasonic Viera",
+        "Philips TV", "Samsung QLED", "LG OLED", "Vizio", "Roku TV", "Insignia", "Toshiba TV", "Hitachi TV", "Westinghouse",
+        "Element Electronics", "Sceptre", "Skyworth", "Changhong", "Vu Televisions", "Thomson TV", "iFFALCON", "Blaupunkt",
+        "Haier TV", "BPL", "Kodak", "Micromax TV", "Lloyd", "Aisen", "Shinco", "Noble Skiodo", "Activa", "Murphy",
+        "Intex", "Salora", "Daewoo", "Akai", "AOC", "Polaroid", "Toshiba Laptops", "Sony Vaio", "Acer Predator",
+        "Asus TUF", "HP Omen", "Dell XPS", "Microsoft Surface", "Lenovo ThinkPad", "Razer Blade", "Alienware Gaming",
+        "MSI Gaming", "Gigabyte Aero", "Huawei MateBook", "Apple MacBook", "Google Chromebook", "Samsung Galaxy Book",
+        "LG Gram", "Fujitsu Laptops", "Panasonic Toughbook", "NEC Computers", "Toshiba Portege", "Sony Walkman",
+        "Bowers & Wilkins Headphones", "Shure", "Jabra", "Plantronics", "Audio-Technica", "Beyerdynamic", "AKG", "Grado",
+        "Focal Headphones", "Audeze", "Sennheiser HD", "V-Moda", "FiiO", "Klipsch Headphones", "Ultimate Ears", "Anker",
+        "Belkin", "Mophie", "OtterBox", "Spigen", "LifeProof", "Incase", "Speck", "Targus", "Kensington", "Case Logic"
+    ]
+    
+    try:
+        for brand in brands:
+            new_brand = Brands(brand_name=brand)  
+            db.session.add(new_brand)
+        
+        db.session.commit()
+        print("Marcas criadas com sucesso!")
+    except Exception as e:
+        db.session.rollback()  
+        print(f"Erro ao criar marcas: {e}")
+
+def create_product_types():
+    types = [
+        "Electronics", "Furniture", "Clothing", "Food", "Appliances", 
+        "Automotive", "Beauty Products", "Books", "Building Materials", 
+        "Cameras", "Cell Phones", "Computers", "Drones", "Fitness Equipment", 
+        "Gaming Consoles", "Garden Supplies", "Groceries", "Hand Tools", 
+        "Health Products", "Home Decor", "Industrial Equipment", "Jewelry", 
+        "Kitchenware", "Laptops", "Lighting", "Luggage", "Musical Instruments", 
+        "Office Supplies", "Outdoor Gear", "Pet Supplies", "Pharmaceuticals", 
+        "Power Tools", "Printers", "Security Systems", "Shoes", "Smart Devices", 
+        "Sporting Goods", "Stationery", "Toys", "TVs", "Vacuum Cleaners", 
+        "Watches", "Wine & Spirits", "Cleaning Supplies", "Medical Equipment", 
+        "Bicycles", "Camping Equipment", "Travel Accessories", "Luxury Goods", 
+        "Art Supplies", "Audio Equipment", "Baby Products", "Bedding", 
+        "Craft Supplies", "Gift Items", "Outdoor Furniture", "Party Supplies", 
+        "Plumbing Supplies", "Seasonal Decor", "Storage Solutions", 
+        "Sunglasses", "Tableware", "Textiles", "Tools", "Toys & Games", 
+        "Vehicles", "Welding Equipment", "Window Coverings", "Workout Gear", 
+        "Bakery Products", "Batteries", "Beverages", "Candles", "Car Care Products",
+        "Cookware", "Cosmetics", "Detergents", "Diapers", "Fabrics", 
+        "Fishing Gear", "Footwear", "Fragrances", "Gardening Tools", 
+        "Gift Cards", "Grills", "Headphones", "Hiking Gear", "Home Improvement", 
+        "Hunting Gear", "Ink & Toner", "Interior Decor", "Janitorial Supplies", 
+        "Laundry Supplies", "Mattresses", "Motorcycle Parts", "Nutritional Supplements", 
+        "Office Furniture", "Painting Supplies", "Party Favors", "Personal Care", 
+        "Pet Food", "Photography Equipment", "Pool Supplies", "Refrigerators", 
+        "Scooters", "Smart Home Devices", "Solar Panels", "Sportswear", 
+        "Stationery Supplies", "Surgical Supplies", "Table Lamps", "Tents", 
+        "Tires", "Travel Bags", "Vitamins & Supplements", "Washing Machines", 
+        "Welding Supplies", "Wind Turbines", "Work Boots", "Yoga Equipment"
+    ]
+
+    try:
+        for t in types:
+            new_type = ProductTypes(product_type=t)  
+            db.session.add(new_type)
+        
+        db.session.commit()
+        print("Tipos criados com sucesso!")
+    except Exception as e:
+        db.session.rollback()  
+        print(f"Erro ao criar marcas: {e}")
+
 if __name__ == "__main__":
     init(autoreset=True)
     with app.app_context():
@@ -1073,6 +1408,11 @@ if __name__ == "__main__":
         #create_user()
         #create_work_schedules()
         #assign_schedules_for_september()
-    app.run(host="0.0.0.0", port=5000, debug=True)
+        #creat_product()
+        #create_test_supplier()
+        #create_sales_entries()
+        #create_brands()
+        #create_product_types()
+    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
 
     # use_reloader=False

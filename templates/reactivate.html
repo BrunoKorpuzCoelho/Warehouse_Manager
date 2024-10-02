@@ -24,14 +24,25 @@
     </form>
     <!-- End of Form for Logout -->
 
+    <!-- Loader -->
+    <div class="🤚">
+        <div class="👉"></div>
+        <div class="👉"></div>
+        <div class="👉"></div>
+        <div class="👉"></div>
+        <div class="🌴"></div>		
+        <div class="👍"></div>
+    </div>
+    <!-- End of Loader -->
+
     <!-- Main Menu -->
-     <main>
+     <main class="main-content" style="display: none;">
         <div class="user-manager-container">
             <div class="user-manager-container">
                 <div class="side-menu">
                     <a href="/dashboard" title="Dashboard"><span class="material-symbols-outlined home">widgets</span></a>
                     <a href="/users-manager" class="active active-users" title="Users Management"><span class="material-symbols-outlined users">account_circle</span></a>
-                    <a href="" title="Warehouse"><span class="material-symbols-outlined warehouse">warehouse</span></a>
+                    <a href="/products-manager" title="Warehouse"><span class="material-symbols-outlined warehouse">warehouse</span></a>
                     <a href="" title="Stock"><span class="material-symbols-outlined inventory">inventory_2</span></a>
                     <a href="" title="Shipping"><span class="material-symbols-outlined shipping">local_shipping</span></a>
                     <a href="" title="Orders"><span class="material-symbols-outlined order">package_2</span></a>
@@ -43,14 +54,12 @@
                 </div>
 
             <div class="reactivate-users-container">
-                <div class="reactivate-users-container-header">
-                    <h3><a href="/dashboard">Dashboard </a><span class="user-manager-cards-title">></span><a href="/users-manager"> User Management </a><span class="user-manager-cards-title">></span><span class="user-manager-cards-title">Reactivate User</span></h3>
-                </div>
-
                 <div class="reactivate-users-filters">
                     <div class="input-search-user-container"> 
-                        <input type="text" id="filter-users" placeholder="Search for users..." title="Search for Users">
-                        <button type="submit" title="Search"><span class="material-symbols-outlined">search</span></button>
+                        <form action="/reactivate-users" method="POST">
+                            <input type="text" id="filter-users" placeholder="Search for users..." title="Search for Users" name="user_name">
+                            <button type="submit" title="Search"><span class="material-symbols-outlined">search</span></button>
+                        </form>
                     </div>
                 </div>
 
@@ -98,5 +107,6 @@
         </div>
      </main>
      <script src="/static/js/main.js"></script>
+     <script src="/static/js/loader.js"></script>
 </body>
 </html>
