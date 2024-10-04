@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!-- LINKS POR COLOCAR -->
 <!DOCTYPE html>
 <html lang="en">
@@ -230,4 +231,238 @@
     <script src="/static/js/main.js"></script>
     <script src="/static/js/error.js"></script>
 </body>
+=======
+<!-- LINKS POR COLOCAR -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule  |  Cubix</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/darkMode.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            min-height: auto;
+            overflow-x: hidden;
+            position: relative;
+        }
+    </style>
+</head>
+<body id="body">
+    <!-- Form for Logout -->
+    <form id="logout-form" action="{{ url_for('logout') }}" method="post" style="display: none;">
+        <input type="hidden" name="logout" value="true">
+    </form>
+    <!-- End of Form for Logout -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}" style="display: none;">
+                {{ message }}
+                </div>
+            {% endfor %}
+            </div>
+        {% endif %}
+        {% endwith %}
+
+    <!-- Main Menu -->
+     <main>
+            <div class="user-manager-container">
+                <div class="side-menu">
+                    <a href="/dashboard" title="Dashboard"><span class="material-symbols-outlined home">widgets</span></a>
+                    <a href="/schedule" class="active active-users" title="Schedule"><span class="material-symbols-outlined users">schedule</span></a>
+                    <a href="/schedule-manager" title="Schedule Manager"><span class="material-symbols-outlined warehouse">calendar_add_on</span></a>
+                    <a href="/schedules-all-records" title="Schedule Record"><span class="material-symbols-outlined inventory">calendar_month</span></a>
+                    <a href="" title="Messages" class="messages-a"><span class="material-symbols-outlined mail">mail</span><span class="mesage-count">10</span></a>
+                    <a href="" title="Settings"><span class="material-symbols-outlined settings">manufacturing</span></a>
+                    <a href="#" onclick="document.getElementById('logout-form').submit();" title="Logout"><span class="material-symbols-outlined users">logout</span></a>
+                </div>
+
+                <div class="schedule-header">
+                    <h3>{{ user.name }}</h3>
+                </div>
+
+                <div class="main-schedule-container">
+                    <div class="schedule_container_wrap">
+                        <div class="schedule_container">
+                            <h3>Time <span class="danger">Tracking</span></h3>
+                            <p class="schedule_container-head-info-p">Check-in and check-out for your shift.</p>
+                            <div class="time-tracking-container">
+                                <form action="" method="POST">
+                                    <div class="form-date">
+                                        <div class="form-row">
+                                            <label for="date">Date:</label>
+                                            <input type="date" id="date" name="date" disabled>
+                        
+                                            <label for="time">Time:</label>
+                                            <input type="time" id="time" name="time" disabled>
+
+                                            <div class="permission-checkbox">
+                                                <label for="log_type">Automatic</label>
+                                                <label class="container-checkbox">
+                                                <input type="checkbox" id="log_type" name="log_type" checked>
+                                                <svg viewBox="0 0 64 64" height="1rem" width="2rem">
+                                                    <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
+                                                </svg>
+                                                </label>
+                                            </div>
+                                            <div class="record-type-container">
+                                                <label for="record_type">Record Type:</label>
+                                                <select id="record_type" name="record_type" {% if log_type == 'on' %}disabled{% endif %} class="record-type-select">
+                                                <option value="Entry" {% if last_record_type == 'Out' %}selected{% endif %}>Entry</option>
+                                                <option value="Out" {% if last_record_type == 'Entry' %}selected{% endif %}>Out</option>
+                                            </select>
+                                            </div>
+                                        </div>
+                        
+                                        <div class="form-row">
+                                            <label for="justification">Justification:</label>
+                                            <textarea id="justification" name="justification" rows="5" cols="50" disabled></textarea>
+                                        </div>
+
+                                        <button type="submit" class="btn-shine time-tracking-submit-btn">Record Time</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="schedule_time_user_wrap">
+                            <h3>Current <span class="danger">Work Shift</span></h3>
+                            <p class="schedule_container-head-info-p">Review your assigned shift for today.</p>
+                            <div class="schedule_time_user">
+                                <table class="work-shift-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Description</th>
+                                            <th>Hour</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if work_schedule %}
+                                            <tr>
+                                                <td>Start Time</td>
+                                                <td>{{ work_schedule.time_in }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>End Time</td>
+                                                <td>{{ work_schedule.time_out }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Lunch Break Start</td>
+                                                <td>{{ work_schedule.lunch_start }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Lunch Break End</td>
+                                                <td>{{ work_schedule.lunch_end }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Total Hours</td>
+                                                <td>
+                                                    {% if total_work_hours is not none %}
+                                                        {{ total_work_hours | round(2) }}
+                                                    {% else %}
+                                                        N/A
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="3">No schedule available for today.</td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                                <a href="#" class="table-more-info-a">show more schedule info</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="last_schedule_records">
+                        <table class="records-table">
+                            <thead>
+                                <tr>
+                                    <th>Record Number</th>
+                                    <th>Record Date and Time</th>
+                                    <th>Record Type</th>
+                                    <th>Record Type</th>
+                                    <th>Justification</th>
+                                    <th>Approved</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in logs %}
+                                <tr>
+                                    <td>{{ loop.index }}</td> 
+                                    <td>{{ log.create_date_in }}</td>
+                                    <td>{{ log.record_type }}</td>
+                                    <td>{{ log.log_type }}</td>
+                                    <td>{{ log.justification }}</td>
+                                    <td>{{ log.status }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5">No records available.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>      
+                        <a href="/schedules-all-records" class="table-more-info-a">Show more records history</a>                  
+                    </div>
+                </div>
+            </div>
+        </div>
+     </main>
+     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const logTypeCheckbox = document.getElementById('log_type');
+            const recordTypeSelect = document.getElementById('record_type');
+            const dateInput = document.getElementById('date');
+            const timeInput = document.getElementById('time');
+            const justificationTextarea = document.getElementById('justification');
+    
+            function setDateTimeToNow() {
+                const now = new Date();
+                dateInput.value = now.toISOString().split('T')[0]; 
+                timeInput.value = now.toTimeString().slice(0, 5);    
+            }
+    
+            function toggleRecordType(disable) {
+                recordTypeSelect.disabled = disable;
+            }
+    
+            if (logTypeCheckbox.checked) {
+                setDateTimeToNow();
+                dateInput.disabled = true;  
+                timeInput.disabled = true;
+                justificationTextarea.disabled = true;
+                toggleRecordType(true); 
+            }
+    
+            logTypeCheckbox.addEventListener('change', function () {
+                if (this.checked) {
+                    setDateTimeToNow();
+                    dateInput.disabled = true; 
+                    timeInput.disabled = true;
+                    justificationTextarea.disabled = true;
+                    toggleRecordType(true); 
+                } else {
+                    dateInput.disabled = false;  
+                    timeInput.disabled = false;
+                    justificationTextarea.disabled = false;
+                    toggleRecordType(false); 
+                }
+            });
+        });
+    </script>
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/error.js"></script>
+</body>
+>>>>>>> origin/main
 </html>

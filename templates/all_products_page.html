@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!-- LINKS POR COLOCAR -->
 <!DOCTYPE html>
 <html lang="en">
@@ -100,4 +101,108 @@
      <script src="/static/js/qr_code_modal.js"></script>
      <script src="/static/js/main.js"></script>
 </body>
+=======
+<!-- LINKS POR COLOCAR -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Products  |  Cubix</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/darkMode.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            min-height: auto;
+            overflow-x: hidden;
+        }
+    </style>
+</head>
+<body id="body">
+    <!-- Form for Logout -->
+    <form id="logout-form" action="{{ url_for('logout') }}" method="post" style="display: none;">
+        <input type="hidden" name="logout" value="true">
+    </form>
+    <!-- End of Form for Logout -->
+
+    <!-- Loader -->
+    <div class="🤚">
+        <div class="👉"></div>
+        <div class="👉"></div>
+        <div class="👉"></div>
+        <div class="👉"></div>
+        <div class="🌴"></div>		
+        <div class="👍"></div>
+    </div>
+    <!-- End of Loader -->
+
+    <!-- Main Menu -->
+     <main class="main-content" style="display: none;">
+        <div class="user-manager-container">
+            <div class="user-manager-container">
+                <div class="side-menu">
+                    <a href="/dashboard" title="Dashboard"><span class="material-symbols-outlined home">widgets</span></a>
+                    <a href="/users-manager" title="Users Management"><span class="material-symbols-outlined users">account_circle</span></a>
+                    <a href="/products-manager" title="Warehouse" class="active active-warehouse"><span class="material-symbols-outlined warehouse">warehouse</span></a>
+                    <a href="" title="Stock"><span class="material-symbols-outlined inventory">inventory_2</span></a>
+                    <a href="" title="Shipping"><span class="material-symbols-outlined shipping">local_shipping</span></a>
+                    <a href="" title="Orders"><span class="material-symbols-outlined order">package_2</span></a>
+                    <a href="" title="Climate Controls"><span class="material-symbols-outlined ac">ac_unit</span></a>
+                    <a href="" title="Payments"><span class="material-symbols-outlined payments">payments</span></a>
+                    <a href="" title="Messages" class="messages-a"><span class="material-symbols-outlined mail">mail</span><span class="mesage-count">10</span></a>
+                    <a href="" title="Settings"><span class="material-symbols-outlined settings">manufacturing</span></a>
+                    <a href="#" onclick="document.getElementById('logout-form').submit();" title="Logout"><span class="material-symbols-outlined users">logout</span></a>
+                </div>
+
+            <div class="user-manager-cards-container">
+                <div class="users-details all-users-details">
+                    <h2>Products</h2>
+                    <p>View and manage all products.</p>
+                    <div class="user-detail-list all-table">
+                        <table class="all-users-table">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Reference</th>
+                                    <th>Product Type</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            {% for product in all_products %}
+                            <tbody>
+                                <tr>
+                                    <td>{{ product.name }}</td>
+                                    <td>{{ product.ref }}</td>
+                                    <td>{{ product.product_type }}</td>
+                                    <td>{{ product.status }}</td>
+                                    <td>
+                                        <a href="#" class="generate-qr-code" data-product-id="{{ product.id }}" data-product-name="{{ product.name }}">Generate QR code</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+        </div>
+     </main>
+
+     <!-- Modal Structure -->
+    <div id="qrCodeModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">QR Code</h2>
+            <img id="qrCodeImage" src="" alt="QR Code">
+        </div>
+    </div>
+     <script src="/static/js/loader.js"></script>
+     <script src="/static/js/qr_code_modal.js"></script>
+     <script src="/static/js/main.js"></script>
+</body>
+>>>>>>> origin/main
 </html>
