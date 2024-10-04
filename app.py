@@ -369,8 +369,8 @@ class ProductTypes(db.Model):
 # Email configuration
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
-SMTP_EMAIL = "srbrunocoelho1996@gmail.com"
-SMTP_PASSWORD = "hpfm nngl ojby qwvv"  
+SMTP_EMAIL = "cubix.w.noreply@gmail.com"
+SMTP_PASSWORD = "pcyt epef eezt nofr"  
 
 # Default Email Configuration
 def send_email(to_email, subject, body):
@@ -394,7 +394,7 @@ def send_email(to_email, subject, body):
         print(f"{Fore.RED}Falha ao enviar email para {to_email}. Erro: {e}")
 
 # Registration Email
-def send_registration_email(user):
+def send_registration_email(user, plain_password):
     subject = "Welcome to Our Service!"
     body = f"""<html lang="en">
 <head>
@@ -419,7 +419,7 @@ def send_registration_email(user):
             <p style="color: #ffffff;">Thank you for registering on our platform.</p>
             <p style="color: #ffffff;">We are providing you with the login credentials for your account as requested. Below are your username and <span style="color: #f7d060; text-decoration: underline; font-size: 1.05rem;">temporary password</span> to access the platform. <span style="color: #1b9c85; font-size: 1.05rem;">We recommend changing the password upon your first login to ensure your account's security.</span></p>
             <p style="color: #ffffff; margin-top: 3rem;">Username: <span style="color: #1b9c85; font-size: 1.2rem;">{user.username}</span></p>
-            <p style="color: #ffffff; margin-bottom: 3rem;">Temporary Password: <span style="color: #1b9c85; margin-top: 1rem; font-size: 1.2rem;">{user.password}</span></p>
+            <p style="color: #ffffff; margin-bottom: 3rem;">Temporary Password: <span style="color: #1b9c85; margin-top: 1rem; font-size: 1.2rem;">{plain_password}</span></p>
             <p style="color: #ffffff;">Best regards,</p>
             <p style="color: #ffffff;">Your Company Team</p>
         </div>
@@ -578,8 +578,11 @@ def manager_new_user():
     
     if request.method == "POST":
         username = request.form["username"]
+
         password = request.form["password"]
-        hashed_password = generate_password_hash(password)  # Gera o hash da senha
+
+        hashed_password = generate_password_hash(password)
+
         name = request.form["name"]
         nif = request.form["nif"]
         cellphone = request.form["cellphone"]
@@ -600,10 +603,9 @@ def manager_new_user():
         can_override_automatic_system_flags = 'can_override_automatic_system_flags' in request.form
         can_manage_orders = 'can_manage_orders' in request.form
 
-        # Criação de um novo usuário com a senha hasheada
         new_user = User(
             username=username,
-            password=hashed_password,  # Senha hasheada sendo armazenada
+            password=hashed_password, 
             name=name,
             nif=nif,
             cellphone=cellphone,
@@ -636,14 +638,14 @@ def manager_new_user():
         print(f"{Fore.GREEN}Permissions have been successfully added.") 
         db.session.commit()
 
-        send_registration_email(new_user)
+        send_registration_email(new_user, password)
         print(f"{Fore.GREEN}Registration Email has been successfully sent")
 
         return redirect(url_for("user_manager"))
 
     else:
         return render_template("manager_new_user_register.html", user=user)
-     
+
 @app.route("/reactivate-users", methods = ["POST", "GET"])
 @login_required
 def reactivate_users():
