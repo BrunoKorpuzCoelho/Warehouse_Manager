@@ -1,0 +1,129 @@
+<!-- LINKS POR COLOCAR -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Settings  |  Cubix</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/darkMode.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            min-height: auto;
+        }
+    </style>
+</head>
+<body id="body">
+    <!-- Form for Logout -->
+    <form id="logout-form" action="{{ url_for('logout') }}" method="post" style="display: none;">
+        <input type="hidden" name="logout" value="true">
+    </form>
+    <!-- End of Form for Logout -->
+
+    <!-- Main Menu -->
+     <main>
+        <div class="user-manager-container">
+            <div class="side-menu">
+                <a href="/dashboard" title="Dashboard"><span class="material-symbols-outlined home">widgets</span></a>
+                <a href="/users-manager" class="active active-users" title="Users Management"><span class="material-symbols-outlined users">account_circle</span></a>
+                <a href="/products-manager" title="Warehouse"><span class="material-symbols-outlined warehouse">warehouse</span></a>
+                <a href="" title="Stock"><span class="material-symbols-outlined inventory">inventory_2</span></a>
+                <a href="" title="Shipping"><span class="material-symbols-outlined shipping">local_shipping</span></a>
+                <a href="" title="Orders"><span class="material-symbols-outlined order">package_2</span></a>
+                <a href="" title="Climate Controls"><span class="material-symbols-outlined ac">ac_unit</span></a>
+                <a href="" title="Payments"><span class="material-symbols-outlined payments">payments</span></a>
+                <a href="" title="Messages" class="messages-a"><span class="material-symbols-outlined mail">mail</span><span class="mesage-count">10</span></a>
+                <a href="" title="Settings"><span class="material-symbols-outlined settings">manufacturing</span></a>
+                <a href="#" onclick="document.getElementById('logout-form').submit();" title="Logout"><span class="material-symbols-outlined users">logout</span></a>
+            </div>
+
+            <div class="user-settings-container">
+                <div class="user-settings-card">
+                    <h2>Profile <span class="danger">Settings</span></h2>
+                    <form action="{{ url_for('user_settings', user_id=user.id) }}" method="POST">
+                        <label for="name">Name</label>
+                        <input type="text" name="name" placeholder="{{ user.name }}">
+            
+                        <label for="password">Password</label>
+                        <input type="text" name="password" placeholder="*********">
+            
+                        <label for="cellphone">Cellphone</label>
+                        <input type="text" name="cellphone" placeholder="{{ user.cellphone }}">
+            
+                        <label for="email">E-mail</label>
+                        <input type="text" name="email" placeholder=" {{ user.email }}">
+            
+                        <button type="submit" class="btn-shine submit-user-settings">Change</button>
+                    </form>
+                </div>
+
+                <div class="user-settings-card">
+                    <h2>Website <span class="danger">Preferences</span></h2>
+                    <div class="theme-preference">
+                        <p class="user-settings-card-p-theme">Theme:</p>
+                        <p>Light</p>
+                        <div class="dark-mode-btn">
+                            <label class="bb8-toggle">
+                                <input class="bb8-toggle__checkbox" type="checkbox" id="darkModeToggle">
+                                <div class="bb8-toggle__container">
+                                    <div class="bb8-toggle__scenery">
+                                        <div class="bb8-toggle__star"></div>
+                                        <div class="bb8-toggle__star"></div>
+                                        <div class="bb8-toggle__star"></div>
+                                        <div class="bb8-toggle__star"></div>
+                                        <div class="bb8-toggle__star"></div>
+                                        <div class="bb8-toggle__star"></div>
+                                        <div class="bb8-toggle__star"></div>
+                                        <div class="tatto-1"></div>
+                                        <div class="tatto-2"></div>
+                                        <div class="gomrassen"></div>
+                                        <div class="hermes"></div>
+                                        <div class="chenini"></div>
+                                        <div class="bb8-toggle__cloud"></div>
+                                        <div class="bb8-toggle__cloud"></div>
+                                        <div class="bb8-toggle__cloud"></div>
+                                    </div>
+                                    <div class="bb8">
+                                        <div class="bb8__head-container">
+                                            <div class="bb8__antenna"></div>
+                                            <div class="bb8__antenna"></div>
+                                            <div class="bb8__head"></div>
+                                        </div>
+                                        <div class="bb8__body"></div>
+                                    </div>
+                                    <div class="artificial__hidden">
+                                        <div class="bb8__shadow"></div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        <p>Dark</p>
+                    </div>
+
+                    <form action="">
+
+                    </form>
+                </div>
+
+                <div class="user-settings-card">
+                    <h2>Account <span class="danger">Support</span></h2>
+                    <div class="support-list">
+                        <ul>
+                            <li><a href="#">Help Center</a></li>
+                            <li><a href="#">Contact Support</a></li>
+                            <li><a href="#">Report a Problem</a></li>
+                            <li><a href="#">Security</a></li>
+                            <li><a href="#">Shipping and Delivery</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+     </main>
+     <script src="/static/js/main.js"></script>
+</body>
+</html>

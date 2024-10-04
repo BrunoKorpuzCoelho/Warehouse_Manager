@@ -1,0 +1,267 @@
+<!-- LINKS POR COLOCAR -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New User  |  Cubix</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/darkMode.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            min-height: auto;
+        }
+    </style>
+</head>
+<body id="body">
+    <!-- Form for Logout -->
+    <form id="logout-form" action="{{ url_for('logout') }}" method="post" style="display: none;">
+        <input type="hidden" name="logout" value="true">
+    </form>
+    <!-- End of Form for Logout -->
+     
+    <!-- Main Menu -->
+     <main>
+        <div class="user-manager-container">
+            <div class="user-manager-container">
+                <div class="side-menu">
+                    <a href="/dashboard" title="Dashboard"><span class="material-symbols-outlined home">widgets</span></a>
+                    <a href="/users-manager" class="active active-users" title="Users Management"><span class="material-symbols-outlined users">account_circle</span></a>
+                    <a href="/products-manager" title="Warehouse"><span class="material-symbols-outlined warehouse">warehouse</span></a>
+                    <a href="" title="Stock"><span class="material-symbols-outlined inventory">inventory_2</span></a>
+                    <a href="" title="Shipping"><span class="material-symbols-outlined shipping">local_shipping</span></a>
+                    <a href="" title="Orders"><span class="material-symbols-outlined order">package_2</span></a>
+                    <a href="" title="Climate Controls"><span class="material-symbols-outlined ac">ac_unit</span></a>
+                    <a href="" title="Payments"><span class="material-symbols-outlined payments">payments</span></a>
+                    <a href="" title="Messages" class="messages-a"><span class="material-symbols-outlined mail">mail</span><span class="mesage-count">10</span></a>
+                    <a href="" title="Settings"><span class="material-symbols-outlined settings">manufacturing</span></a>
+                    <a href="#" onclick="document.getElementById('logout-form').submit();" title="Logout"><span class="material-symbols-outlined users">logout</span></a>
+                </div>
+
+            <div class="manager-new-registration">
+                <h2>Register</h2>
+                <p>Create a new account</p>
+
+                <form action="/manager-new-user" method="POST">
+                    <div class="manager-new-registration-inner">
+                        <div class="new-register-user-form">
+                            <div class="manager-new-registration-input">
+                                <div class="manager-new-registration-label-input">
+                                    <label for="username">Username</label>
+                                    <input type="text" name="username" required placeholder="João">
+                                </div>
+
+                                <div class="manager-new-registration-label-input">
+                                    <label for="password">Password</label>
+                                    <input type="password" name="password" required placeholder="••••••••">
+                                </div>
+                            </div>
+
+                            <div class="manager-new-registration-input">
+                                <div class="manager-new-registration-label-input">
+                                    <label for="name">Name</label>
+                                    <input type="text" name="name" required placeholder="João Rodrigues">
+                                </div>
+
+                                <div class="manager-new-registration-label-input">
+                                    <label for="nif">NIF</label>
+                                    <input type="text" name="nif" required placeholder="xxxxxxxxx">
+                                </div>
+                            </div>
+
+                            <div class="manager-new-registration-input">
+                                <div class="manager-new-registration-label-input">
+                                    <label for="cellphone">Cellphone</label>
+                                    <input type="text" name="cellphone" required placeholder="912345678">
+                                </div>
+
+                                <div class="manager-new-registration-label-input">
+                                    <label for="email">Email</label>
+                                    <input type="email" name="email" required placeholder="email@example.com">
+                                </div>
+                            </div>
+
+                            <div class="manager-new-registration-input">
+                                <div class="manager-new-registration-label-input">
+                                    <label for="role">Role</label>
+                                    <select name="role" id="role" required>
+                                        <option value="" disabled selected>Select role</option>
+                                        <option value="Chief Executive Officer (CEO)">Chief Executive Officer (CEO)</option>
+                                        <option value="Chief Operating Officer (COO)">Chief Operating Officer (COO)</option>
+                                        <option value="Chief Financial Officer (CFO)">Chief Financial Officer (CFO)</option>
+                                        <option value="Chief Technology Officer (CTO)">Chief Technology Officer (CTO)</option>
+                                        <option value="Chief Marketing Officer (CMO)">Chief Marketing Officer (CMO)</option>
+                                        <option value="Chief Human Resources Officer (CHRO)">Chief Human Resources Officer (CHRO)</option>
+                                        <option value="Vice President (VP) of Operations">Vice President (VP) of Operations</option>
+                                        <option value="Operations Manager">Operations Manager</option>
+                                        <option value="Sales Manager">Sales Manager</option>
+                                        <option value="IT Manager">IT Manager</option>
+                                        <option value="Warehouse Manager">Warehouse Manager</option>
+                                        <option value="Logistics Manager">Logistics Manager</option>
+                                        <option value="IT Specialist">IT Specialist</option>
+                                        <option value="Warehouse Supervisor">Warehouse Supervisor</option>
+                                        <option value="Logistics Coordinator">Logistics Coordinator</option>
+                                        <option value="Warehouse Worker">Warehouse Worker</option>
+                                        <option value="Production Worker">Production Worker</option>
+                                        <option value="Logistics Assistant">Logistics Assistant</option>
+                                        <option value="Lead Software Engineer">Lead Software Engineer</option>
+                                        <option value="Senior Software Engineer">Senior Software Engineer</option>
+                                        <option value="Junior Software Developer">Junior Software Developer</option>
+                                    </select>
+                                </div>
+
+                                <div class="manager-new-registration-label-input">
+                                    <label for="user_type">User Type</label>
+                                    <select name="user_type" id="user_type" required>
+                                        <option value="" disabled selected>Select user type</option>
+                                        <option value="Admin">Admin</option>
+                                        <option value="Manager">Manager</option>
+                                        <option value="Employee">Employee</option>
+                                        <option value="Client">Client</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <div class="new-register-permission-form">
+                            <h3>Permissions:</h3>
+                            <div class="new-register-permission-checkbox">
+                                <div class="permission-checkbox">
+                                    <label class="container-checkbox">
+                                    <input type="checkbox" name="can_create_new_users">
+                                    <svg viewBox="0 0 64 64" height="1rem" width="2rem">
+                                        <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
+                                    </svg>
+                                    </label>
+                                    <label for="can_create_new_users">Create and edit Users</label>
+                                </div>
+                                <div class="permission-checkbox">
+                                    <label class="container-checkbox">
+                                        <input type="checkbox" name="can_active_users">
+                                        <svg viewBox="0 0 64 64" height="1rem" width="2rem">
+                                            <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
+                                        </svg>
+                                        </label>
+                                    <label for="can_active_users">Active/Deactive Users</label>
+                                </div>
+                            </div>
+
+                            <div class="new-register-permission-checkbox">
+                                <div class="permission-checkbox">
+                                    <label class="container-checkbox">
+                                    <input type="checkbox" name="can_adjust_inventory_differences">
+                                    <svg viewBox="0 0 64 64" height="1rem" width="2rem">
+                                        <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
+                                    </svg>
+                                    </label>
+                                    <label for="can_adjust_inventory_differences">Adjust Inventory Differences</label>
+                                </div>
+                                <div class="permission-checkbox">
+                                    <label class="container-checkbox">
+                                        <input type="checkbox" name="can_manage_suppliers">
+                                        <svg viewBox="0 0 64 64" height="1rem" width="2rem">
+                                            <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
+                                        </svg>
+                                        </label>
+                                    <label for="can_manage_suppliers">Manage Suppliers</label>
+                                </div>
+                            </div>
+
+                            <div class="new-register-permission-checkbox">
+                                <div class="permission-checkbox">
+                                    <label class="container-checkbox">
+                                    <input type="checkbox" name="can_view_temperature_logs">
+                                    <svg viewBox="0 0 64 64" height="1rem" width="2rem">
+                                        <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
+                                    </svg>
+                                    </label>
+                                    <label for="can_view_temperature_logs">View Temperature Logs</label>
+                                </div>
+                                <div class="permission-checkbox">
+                                    <label class="container-checkbox">
+                                        <input type="checkbox" name="can_adjust_temperature_discrepancies">
+                                        <svg viewBox="0 0 64 64" height="1rem" width="2rem">
+                                            <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
+                                        </svg>
+                                        </label>
+                                    <label for="can_adjust_temperature_discrepancies">Adjust Temperature Discrepancies</label>
+                                </div>
+                            </div>
+
+                            <div class="new-register-permission-checkbox">
+                                <div class="permission-checkbox">
+                                    <label class="container-checkbox">
+                                    <input type="checkbox" name="can_access_high_security_areas">
+                                    <svg viewBox="0 0 64 64" height="1rem" width="2rem">
+                                        <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
+                                    </svg>
+                                    </label>
+                                    <label for="can_access_high_security_areas">Access High Security Areas</label>
+                                </div>
+                                <div class="permission-checkbox">
+                                    <label class="container-checkbox">
+                                        <input type="checkbox" name="can_generate_financial_reports">
+                                        <svg viewBox="0 0 64 64" height="1rem" width="2rem">
+                                            <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
+                                        </svg>
+                                        </label>
+                                    <label for="can_generate_financial_reports">Generate Financial Reports</label>
+                                </div>
+                            </div>
+
+                            <div class="new-register-permission-checkbox">
+                                <div class="permission-checkbox">
+                                    <label class="container-checkbox">
+                                    <input type="checkbox" name="can_manage_user_permissions">
+                                    <svg viewBox="0 0 64 64" height="1rem" width="2rem">
+                                        <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
+                                    </svg>
+                                    </label>
+                                    <label for="can_manage_user_permissions">Manage User Permissions</label>
+                                </div>
+                                <div class="permission-checkbox">
+                                    <label class="container-checkbox">
+                                        <input type="checkbox" name="can_view_audit_logs">
+                                        <svg viewBox="0 0 64 64" height="1rem" width="2rem">
+                                            <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
+                                        </svg>
+                                        </label>
+                                    <label for="can_view_audit_logs">View Audit Logs</label>
+                                </div>
+                            </div>
+
+                            <div class="new-register-permission-checkbox">
+                                <div class="permission-checkbox">
+                                    <label class="container-checkbox">
+                                    <input type="checkbox" name="can_override_automatic_system_flags">
+                                    <svg viewBox="0 0 64 64" height="1rem" width="2rem">
+                                        <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
+                                    </svg>
+                                    </label>
+                                    <label for="can_override_automatic_system_flags">Override Automatic System Flags</label>
+                                </div>
+                                <div class="permission-checkbox">
+                                    <label class="container-checkbox">
+                                        <input type="checkbox" name="can_manage_orders">
+                                        <svg viewBox="0 0 64 64" height="1rem" width="2rem">
+                                            <path d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16" pathLength="575.0541381835938" class="path"></path>
+                                        </svg>
+                                        </label>
+                                    <label for="can_manage_orders">Manage Orders</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="edit-user-submit-btn">Submit</button>
+                </form>
+            </div>
+        </div>
+     </main>
+     <script src="/static/js/main.js"></script>
+</body>
+</html>
