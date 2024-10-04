@@ -18,6 +18,9 @@ from random import *
 import random
 import qrcode
 from io import *
+import string
+
+# cubix-no-reply@hotmail.com
 
 # App config
 app = Flask(__name__)
@@ -1437,7 +1440,6 @@ if __name__ == "__main__":
         #create_sales_entries()
         #create_brands()
         #create_product_types()
-    app.run(host="0.0.0.0", port=5000, debug=True)
-
+    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
 
     # use_reloader=False
