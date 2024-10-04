@@ -6,6 +6,8 @@ from sqlalchemy import *
 from datetime import *
 import base64
 import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from email.message import EmailMessage
 from sqlalchemy.orm import validates
 import random
@@ -16,6 +18,8 @@ from random import *
 import random
 import qrcode
 from io import *
+
+# cubix-no-reply@hotmail.com
 
 # App config
 app = Flask(__name__)
@@ -363,29 +367,31 @@ class ProductTypes(db.Model):
         self.product_type = product_type
 
 # Email configuration
-SMTP_SERVER = 'smtp-mail.outlook.com'
+SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
-SMTP_EMAIL = "***"
-SMTP_PASSWORD = "***" 
+SMTP_EMAIL = "srbrunocoelho1996@gmail.com"
+SMTP_PASSWORD = "hpfm nngl ojby qwvv" 
 
 # Default Email Configuration
 def send_email(to_email, subject, body):
-    msg = EmailMessage()
-    msg['From'] = SMTP_EMAIL
-    msg['To'] = to_email
-    msg['Subject'] = subject
-    msg.set_content(body)
-
-    msg.add_alternative(body, subtype='html')
-
     try:
+        msg = MIMEMultipart()
+        msg['From'] = SMTP_EMAIL
+        msg['To'] = to_email
+        msg['Subject'] = subject
+
+        msg.attach(MIMEText(body, 'html'))
+
+        # Enviar o email
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
             server.starttls()
             server.login(SMTP_EMAIL, SMTP_PASSWORD)
-            server.send_message(msg)
-            print(f"{Fore.GREEN}Email sent to {to_email} with subject: {subject}")
+            server.sendmail(SMTP_EMAIL, to_email, msg.as_string())
+
+        print(f"{Fore.GREEN}Email enviado com sucesso para {to_email}.")
+    
     except Exception as e:
-        print(f"{Fore.RED}Failed to send email to {to_email}. Error: {e}")
+        print(f"{Fore.RED}Falha ao enviar email para {to_email}. Erro: {e}")
 
 # Registration Email
 def send_registration_email(user):
@@ -429,7 +435,23 @@ def send_registration_email(user):
 </body>
 </html>
     """
-    send_email(user.email, subject, body)
+
+    msg = EmailMessage()
+    msg['Subject'] = subject
+    msg['From'] = SMTP_EMAIL
+    msg['To'] = user.email
+
+    # Adicionar o conteúdo HTML ao email
+    msg.add_alternative(body, subtype='html')
+
+    try:
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as smtp:
+            smtp.starttls()  # Ativa a criptografia
+            smtp.login(SMTP_EMAIL, SMTP_PASSWORD)
+            smtp.send_message(msg)
+            print(f"Email successfully sent to {user.email}")
+    except Exception as e:
+        print(f"Failed to send email to {user.email}. Error: {e}")
 
 # Forgot Password Email
 def send_password_reset_email(user, new_password):
@@ -546,17 +568,18 @@ def user_manager():
 
         return render_template("users_manager.html", user=user, last_user_id=last_user_id, new_users_count=new_users_count, deactivated_users_count=deactivated_users_count, deactivated_users_recent_count=deactivated_users_recent_count, total_permissions=total_permissions, all_users=all_users)
     
-@app.route("/manager-new-user", methods=["GET", "POST"])
+@app.route("/manager-new-user", methods=["GET", "POST"]) 
 @login_required
 def manager_new_user():
     user = current_user if current_user.is_authenticated else None
 
-    if not user.permissions.can_create_new_users :
+    if not user.permissions.can_create_new_users:
         return render_template("no_permission_page.html", user=user)
     
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
+        hashed_password = generate_password_hash(password)  # Gera o hash da senha
         name = request.form["name"]
         nif = request.form["nif"]
         cellphone = request.form["cellphone"]
@@ -577,15 +600,16 @@ def manager_new_user():
         can_override_automatic_system_flags = 'can_override_automatic_system_flags' in request.form
         can_manage_orders = 'can_manage_orders' in request.form
 
-        new_user = User (
-            username = username,
-            password = password,
-            name = name,
-            nif = nif,
-            cellphone = cellphone,
-            email = email,
-            role = role,
-            user_type = user_type,
+        # Criação de um novo usuário com a senha hasheada
+        new_user = User(
+            username=username,
+            password=hashed_password,  # Senha hasheada sendo armazenada
+            name=name,
+            nif=nif,
+            cellphone=cellphone,
+            email=email,
+            role=role,
+            user_type=user_type,
         )
 
         db.session.add(new_user)
@@ -594,18 +618,18 @@ def manager_new_user():
 
         new_user_permissions = UserPermissions(
             user_id=new_user.id,
-            can_create_new_users = can_create_new_users,
-            can_active_users = can_active_users,
-            can_adjust_inventory_differences = can_adjust_inventory_differences,
-            can_manage_suppliers = can_manage_suppliers,
-            can_view_temperature_logs = can_view_temperature_logs,
-            can_adjust_temperature_discrepancies = can_adjust_temperature_discrepancies,
-            can_access_high_security_areas = can_access_high_security_areas,
-            can_generate_financial_reports = can_generate_financial_reports,
-            can_manage_user_permissions = can_manage_user_permissions,
-            can_view_audit_logs = can_view_audit_logs,
-            can_override_automatic_system_flags = can_override_automatic_system_flags,
-            can_manage_orders = can_manage_orders
+            can_create_new_users=can_create_new_users,
+            can_active_users=can_active_users,
+            can_adjust_inventory_differences=can_adjust_inventory_differences,
+            can_manage_suppliers=can_manage_suppliers,
+            can_view_temperature_logs=can_view_temperature_logs,
+            can_adjust_temperature_discrepancies=can_adjust_temperature_discrepancies,
+            can_access_high_security_areas=can_access_high_security_areas,
+            can_generate_financial_reports=can_generate_financial_reports,
+            can_manage_user_permissions=can_manage_user_permissions,
+            can_view_audit_logs=can_view_audit_logs,
+            can_override_automatic_system_flags=can_override_automatic_system_flags,
+            can_manage_orders=can_manage_orders
         )
 
         db.session.add(new_user_permissions)
@@ -618,8 +642,8 @@ def manager_new_user():
         return redirect(url_for("user_manager"))
 
     else:
-        return render_template("manager_new_user_register.html",  user=user)
-    
+        return render_template("manager_new_user_register.html", user=user)
+     
 @app.route("/reactivate-users", methods = ["POST", "GET"])
 @login_required
 def reactivate_users():
