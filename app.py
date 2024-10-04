@@ -18,9 +18,6 @@ from random import *
 import random
 import qrcode
 from io import *
-import string
-
-# cubix-no-reply@hotmail.com
 
 # App config
 app = Flask(__name__)
