@@ -369,8 +369,8 @@ class ProductTypes(db.Model):
 # Email configuration
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
-SMTP_EMAIL = "***"
-SMTP_PASSWORD = "***" 
+SMTP_EMAIL = "srbrunocoelho1996@gmail.com"
+SMTP_PASSWORD = "hpfm nngl ojby qwvv"  
 
 # Default Email Configuration
 def send_email(to_email, subject, body):
