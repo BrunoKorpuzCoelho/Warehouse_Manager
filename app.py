@@ -20,7 +20,6 @@ import qrcode
 from io import *
 import string
 
-# cubix-no-reply@hotmail.com
 
 # App config
 app = Flask(__name__)
@@ -442,12 +441,11 @@ def send_registration_email(user, plain_password):
     msg['From'] = SMTP_EMAIL
     msg['To'] = user.email
 
-    # Adicionar o conteúdo HTML ao email
     msg.add_alternative(body, subtype='html')
 
     try:
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as smtp:
-            smtp.starttls()  # Ativa a criptografia
+            smtp.starttls()
             smtp.login(SMTP_EMAIL, SMTP_PASSWORD)
             smtp.send_message(msg)
             print(f"Email successfully sent to {user.email}")
@@ -480,6 +478,14 @@ def validate_user_type(self, key, user_type):
     allowed_types = ["Admin", "Manager", "Employee", "Client"]
     assert user_type in allowed_types, f"Invalid user type. Allowed types are {allowed_types}"
     return user_type
+
+def generate_reference():
+    characters_part = ''.join(random.choices(string.ascii_lowercase, k=3))
+    
+    numbers_part = ''.join(random.choices(string.digits, k=9))
+    
+    reference = characters_part + numbers_part
+    return reference
 
 @app.route("/")
 def normal():
@@ -1103,22 +1109,51 @@ def products_manager():
 def create_new_product():
     user = current_user if current_user.is_authenticated else None
     if user.user_type == "Admin" or user.user_type == "Manager":
-        brand = request.form.get("brand")
-        name = request.form.get("name")
-        product_type = request.form.get("product_type")
-        buy_price = request.form.get("buy_price")
-        margin = request.form.get("margin")
-        min_recommended_stock = request.form.get("min_recommended_stock")
-        warehouse_section = request.form.get("warehouse_section")
-        warehouse_shelf = request.form.get("warehouse_shelf")
-
         if request.method == "POST":
+            ref = generate_reference()
+
+            brand = request.form.get("brand")
+            name = request.form.get("name")
+            product_type = request.form.get("product_type")
+            buy_price = float(request.form.get("buy_price"))
+            margin = float(request.form.get("margin"))
+            min_recommended_stock = int(request.form.get("min_recommended_stock"))
+            warehouse_section = request.form.get("warehouse_section")
+            warehouse_shelf = request.form.get("warehouse_shelf")
+
             sell_price = buy_price + (buy_price * margin / 100)
             
             new_product = Product(
-                brand = brand,
-                # Continuar a criar a criação dos dados para inserir na base de dados
+                qr_code_path = "",
+                ref = ref,
+                model = "",
+                brand=brand,
+                name=name,
+                product_type=product_type,
+                buy_price=buy_price,
+                sell_price=sell_price,
+                margin=margin,
+                stock=0, 
+                min_recommended_stock=min_recommended_stock,
+                warehouse_section=warehouse_section,
+                warehouse_shelf=warehouse_shelf,
+                status="Active", 
+                last_update=datetime.now().strftime('%d/%m/%Y %H:%M'),
+                update_info="Created by Admin"
             )
+
+            db.session.add(new_product)
+            db.session.commit()
+
+            product_id = new_product.id
+
+            qr_code_url = f"http://192.168.68.72:5000/product-page/{product_id}"
+
+            new_product.qr_code_path = qr_code_url
+            db.session.commit()
+
+            print(f"{Fore.GREEN}Product created successfully with ID {product_id} and QR Code Path {qr_code_url}")
+            return redirect(url_for("products_manager"))
         else:
             return render_template("create_new_product.html", user=user)
     else:
@@ -1181,6 +1216,18 @@ def generate_qr_code(product_id):
     img_io.seek(0)
 
     return send_file(img_io, mimetype='image/png')
+
+@app.route("/products-out-of-stock", methods=["GET", "POST"])
+@login_required
+def products_out_of_stock():
+    user = current_user if current_user.is_authenticated else None
+    out_of_stock_products = Product.query.filter_by(stock=0).all()
+
+    if request.method == "POST":
+        pass
+    else:
+        return render_template("products_out_of_stock.html", user=user, out_of_stock_products=out_of_stock_products)
+
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1309,7 +1356,7 @@ def create_test_supplier():
 def create_sales_entries():
     customers = ["John Doe", "Jane Smith", "Michael Johnson", "Emily Davis", "Chris Brown"]
     
-    product_ids = [1, 2,3]
+    product_ids = [1, 2, 3, 4]
     user_ids = [1, 2]  
     
     for _ in range(20):
@@ -1440,6 +1487,6 @@ if __name__ == "__main__":
         #create_sales_entries()
         #create_brands()
         #create_product_types()
-    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
+    app.run(host="0.0.0.0", port=5000, debug=True)
 
     # use_reloader=False

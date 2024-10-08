@@ -68,7 +68,7 @@
                                 <h2 class="number-of-users">{{ out_of_stock_products_count }}</h2>
                                 <p>Products out of stock</p>
                             </div>
-                                <a href="" class="btn-shine">View Products</a>
+                                <a href="/products-out-of-stock" class="btn-shine">View Products</a>
                         </div>
 
                         <p class="users-card-final-p">Total number of products currently out of stock in the system.</p>
@@ -118,7 +118,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for product, total_sales, total_profit in best_selling_products[:3] %}
+                                {% for product, total_sales, total_profit in best_selling_products[:4] %}
                                 <tr>
                                     <td>{{ product }}</td>
                                     <td>{{ total_sales }}</td>

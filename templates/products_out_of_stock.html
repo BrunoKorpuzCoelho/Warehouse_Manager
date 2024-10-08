@@ -1,0 +1,123 @@
+<!-- LINKS POR COLOCAR -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products Out Off Stock  |  Cubix</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/darkMode.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            min-height: auto;
+            overflow-x: hidden;
+            position: relative;
+        }
+    </style>
+</head>
+<body id="body">
+    <!-- Form for Logout -->
+    <form id="logout-form" action="{{ url_for('logout') }}" method="post" style="display: none;">
+        <input type="hidden" name="logout" value="true">
+    </form>
+    <!-- End of Form for Logout -->
+
+    <!-- Loader -->
+    <div class="🤚">
+        <div class="👉"></div>
+        <div class="👉"></div>
+        <div class="👉"></div>
+        <div class="👉"></div>
+        <div class="🌴"></div>		
+        <div class="👍"></div>
+    </div>
+    <!-- End of Loader -->
+
+    <!-- Main Menu -->
+     <main class="main-content" style="display: none;">
+            <div class="user-manager-container">
+                <div class="side-menu">
+                    <a href="/dashboard" title="Dashboard"><span class="material-symbols-outlined home">widgets</span></a>
+                    <a href="/users-manager" title="Users Management"><span class="material-symbols-outlined users">account_circle</span></a>
+                    <a href="/products-manager" title="Warehouse" class="active active-warehouse"><span class="material-symbols-outlined warehouse">warehouse</span></a>
+                    <a href="" title="Stock"><span class="material-symbols-outlined inventory">inventory_2</span></a>
+                    <a href="" title="Shipping"><span class="material-symbols-outlined shipping">local_shipping</span></a>
+                    <a href="" title="Orders"><span class="material-symbols-outlined order">package_2</span></a>
+                    <a href="" title="Climate Controls"><span class="material-symbols-outlined ac">ac_unit</span></a>
+                    <a href="" title="Payments"><span class="material-symbols-outlined payments">payments</span></a>
+                    <a href="" title="Messages" class="messages-a"><span class="material-symbols-outlined mail">mail</span><span class="mesage-count">10</span></a>
+                    <a href="" title="Settings"><span class="material-symbols-outlined settings">manufacturing</span></a>
+                    <a href="#" onclick="document.getElementById('logout-form').submit();" title="Logout"><span class="material-symbols-outlined users">logout</span></a>
+                </div>
+
+                <div class="schedule-manager-container">
+                    <div class="schedule-manager-wrap">
+                        <div class="schedule-manager-header">
+                            <form id="filter-form">
+                                <label for="record_type">Record Type:</label>
+                                <select name="record_type" id="filter-record-type">
+                                    <option value="all">All Records</option>
+                                    <option value="Entry">Entry</option>
+                                    <option value="Out">Out</option>
+                                </select>
+                        
+                                <label for="status">Status Type:</label>
+                                <select name="status" id="filter-status">
+                                    <option value="all">All Records</option>
+                                    <option value="Approved">Approved</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Rejected">Rejected</option>
+                                </select>
+                        
+                                <label for="log_type">Log Type:</label>
+                                <select name="log_type" id="filter-log-type">
+                                    <option value="all">All Records</option>
+                                    <option value="Automatic">Automatic</option>
+                                    <option value="Manual">Manual</option>
+                                </select>
+                        
+                                <button type="button" class="btn-shine schedule-manager-search-btn" onclick="applyFilters()">Search</button>
+                            </form>
+                        </div> 
+                    </div>
+
+                    <div class="search-schedule-manager-container">
+                        <table class="work-shift-table schedule-search-table">
+                            <thead>
+                                <tr>
+                                    <th>Record ID</th>
+                                    <th>Record Date and Time</th>
+                                    <th>Record Type</th>
+                                    <th>Status</th>
+                                    <th>Log Type</th>
+                                    <th>Justification</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            {% for product in out_of_stock_products %}
+                            <tbody id="schedule-records">
+                                <tr>
+                                    <td>{{ product.id }}</td>
+                                    <td>{{ product.name }}</td>
+                                    <td class="record-type"></td>
+                                    <td class="status"></td>
+                                    <td class="log-type"></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+     </main>
+     <script src="/static/js/loader.js"></script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
