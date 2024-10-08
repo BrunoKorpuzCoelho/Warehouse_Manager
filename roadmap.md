@@ -1,0 +1,9 @@
+# Roadmap do Projeto
+
+| Step                                             | Description                                                                          | Status                               | Completion Forecast | Collaborator                       |
+|----------------------------------------------|----------------------------------------------------------------------------|-----------------------------------|---------------------------------|-------------------------------------|
+|**Phase 1: Initial Setup**             | Configure development environment                      | Done                  | 10/10/2024                     |          Bruno Coelho                                  |
+| **Phase 2: Frontend**                   | Develop initial website layout                                      | Working                         |       01/02/2025      |                     Bruno Coelho                        |
+| **Phase 3: Backend**                   | Create API and integrate with the database                       | Working                         |     01/02/2025               |                Bruno Coelho                            |
+| **Phase 4: Testing**                     | Test features and fix bugs                               | Planned                          |       10/02/2025         |                     Bruno Coelho                       |
+| **Phase 5: Deploy**                       | Deploy the application into production                          | Planned                         |       15/02/2025          |                 Bruno Coelho                           |
