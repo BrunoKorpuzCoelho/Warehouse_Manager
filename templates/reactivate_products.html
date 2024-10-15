@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Products Out Off Stock  |  Cubix</title>
+    <title>Reactivate Users |  Cubix</title>
     <link rel="stylesheet" href="/static/css/main.css">
     <link rel="stylesheet" href="/static/css/darkMode.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -14,8 +14,6 @@
             flex-direction: column;
             position: relative;
             min-height: auto;
-            overflow-x: hidden;
-            position: relative;
         }
     </style>
 </head>
@@ -39,6 +37,7 @@
 
     <!-- Main Menu -->
      <main class="main-content" style="display: none;">
+        <div class="user-manager-container">
             <div class="user-manager-container">
                 <div class="side-menu">
                     <a href="/dashboard" title="Dashboard"><span class="material-symbols-outlined home">widgets</span></a>
@@ -54,72 +53,55 @@
                     <a href="#" onclick="document.getElementById('logout-form').submit();" title="Logout"><span class="material-symbols-outlined users">logout</span></a>
                 </div>
 
-                <div class="schedule-manager-container">
-                    <div class="schedule-manager-container">
-                        <div class="schedule-manager-wrap">
-                            <div class="schedule-manager-header">
-                                <form id="filter-form" action="/products-out-of-stock" method="GET">
-                                    <label for="brand">Brand:</label>
-                                    <input type="text" name="brand" id="brand" placeholder="Enter brand...">
-                                    
-                                    <label for="description">Description:</label>
-                                    <input type="text" name="description" id="description" placeholder="Enter product description...">
-                                
-                                    <button type="submit" class="btn-shine">Search</button>
-                                </form>
-                            </div>
-                        </div>
+            <div class="reactivate-users-container">
+                <div class="reactivate-users-filters">
+                    <div class="input-search-user-container"> 
+                        <form action="/reactivate-product" method="POST">
+                            <input type="text" id="filter-products" placeholder="Search for products..." title="Search for Products" name="product_name">
+                            <button type="submit" title="Search"><span class="material-symbols-outlined">search</span></button>
+                        </form>
+                    </div>
+                </div>                
 
-                    <div class="search-schedule-manager-container">
-                        <table class="work-shift-table schedule-search-table">
-                            <thead>
-                                <tr>
-                                    <th>Brand</th>
-                                    <th>Description</th>
-                                    <th>Reference</th>
-                                    <th>Product Type</th>
-                                    <th>Stock</th>
-                                    <th>Min. Recommended Stock</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            {% for product in out_of_stock_products %}
-                            <tbody id="schedule-records">
-                                <tr>
-                                    <td>{{ product.brand }}</td>
-                                    <td>{{ product.name }}</td>
+                <div class="reactivate-users-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Reference</th>
+                                <th>Product Type</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        {% for product in all_products %}
+                        <tbody>
+                            <tr>
+                                <td>{{ product.name }}</td>
                                     <td>{{ product.ref }}</td>
                                     <td>{{ product.product_type }}</td>
-                                    <td>{{ product.stock }}</td>
-                                    <td>{{ product.min_recommended_stock }}</td>
                                     <td>{{ product.status }}</td>
                                     <td>
-                                        <a href="#" class="generate-qr-code" data-product-id="{{ product.id }}" data-product-name="{{ product.name }}">Generate QR code</a>  |  <a href="{{ url_for('product_page', product_id=product.id) }}" target="_blank">More info</a>
+                                        {% if product.status == 'Active' %}
+                                            <form action="{{ url_for('change_product_status', product_id=product.id, new_status='Inactive') }}" method="post">
+                                                <button type="submit" class="btn-inactive">Inactive</button>
+                                            </form>
+                                        {% else %}
+                                            <form action="{{ url_for('change_product_status', product_id=product.id, new_status='Active') }}" method="post">
+                                                <button type="submit" class="btn-activate">Active</button>
+                                            </form>
+                                        {% endif %}
                                     </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
+
         </div>
      </main>
-
-     <!-- Modal Structure -->
-    <div id="qrCodeModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2 id="modalTitle">QR Code</h2>
-            <img id="qrCodeImage" src="" alt="QR Code">
-        </div>
-    </div>
-    <!-- End of Modal Structure -->
-
+     <script src="/static/js/main.js"></script>
      <script src="/static/js/loader.js"></script>
-     <script src="/static/js/qr_code_modal.js"></script>
-    <script src="/static/js/main.js"></script>
-    <script src="/static/js/request.js"></script>
 </body>
 </html>

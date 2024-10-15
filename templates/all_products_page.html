@@ -77,7 +77,7 @@
                                     <td>{{ product.product_type }}</td>
                                     <td>{{ product.status }}</td>
                                     <td>
-                                        <a href="#" class="generate-qr-code" data-product-id="{{ product.id }}" data-product-name="{{ product.name }}">Generate QR code</a>
+                                        <a href="#" class="generate-qr-code" data-product-id="{{ product.id }}" data-product-name="{{ product.name }}">Generate QR code</a>  |  <a href="{{ url_for('product_page', product_id=product.id) }}" target="_blank">More info</a>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -96,6 +96,8 @@
             <img id="qrCodeImage" src="" alt="QR Code">
         </div>
     </div>
+    <!-- End of Modal Structure -->
+     
      <script src="/static/js/loader.js"></script>
      <script src="/static/js/qr_code_modal.js"></script>
      <script src="/static/js/main.js"></script>

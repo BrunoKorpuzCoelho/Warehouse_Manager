@@ -1221,13 +1221,104 @@ def generate_qr_code(product_id):
 @login_required
 def products_out_of_stock():
     user = current_user if current_user.is_authenticated else None
-    out_of_stock_products = Product.query.filter_by(stock=0).all()
+
+    brand_filter = request.args.get('brand', '').lower()  
+    description_filter = request.args.get('description', '').lower()  
+
+    query = Product.query.filter_by(stock=0)
+
+    if brand_filter:
+        query = query.filter(Product.brand.ilike(f'%{brand_filter}%')) 
+
+    if description_filter:
+        query = query.filter(Product.name.ilike(f'%{description_filter}%'))  
+
+    out_of_stock_products = query.all()
+
+    return render_template("products_out_of_stock.html", user=user, out_of_stock_products=out_of_stock_products)
+
+@app.route("/reactivate-product", methods=["GET", "POST"])
+@login_required
+def reactive_product():
+    user = current_user if current_user.is_authenticated else None
 
     if request.method == "POST":
-        pass
-    else:
-        return render_template("products_out_of_stock.html", user=user, out_of_stock_products=out_of_stock_products)
+        product_name = request.form.get('product_name', '').lower()
+        
+        all_products = Product.query.filter(Product.name.ilike(f'%{product_name}%')).all()
 
+        return render_template("reactivate_products.html", user=user, all_products=all_products)
+    
+    else:
+        all_products = Product.query.all()
+        return render_template("reactivate_products.html", user=user, all_products=all_products)
+
+@app.route("/change-product-status/<int:product_id>/<string:new_status>", methods=["POST"])
+@login_required
+def change_product_status(product_id, new_status):
+    user = current_user if current_user.is_authenticated else None
+
+    if user.user_type not in ['Admin', 'Manager']: 
+        flash("You don't have permission to change product status.", "danger")
+        return render_template("no_permission_page.html", user=user)
+
+    product = Product.query.get_or_404(product_id)
+
+    product.status = new_status
+
+    db.session.commit()
+
+    flash(f"Product status changed to {new_status}.", "success")
+    return redirect(url_for('reactive_product'))
+
+@app.route("/create-new-supplier", methods=["POST", "GET"])
+@login_required
+def create_new_supplier():
+    user = current_user if current_user.is_authenticated else None
+    if not user.permissions.can_manage_suppliers:
+        flash("You don't have permission to create new suppliers.", "danger")
+        return render_template("no_permission_page.html", user=user)
+    else:
+        if request.method == "POST":
+            try:
+                supplier_name = request.form.get("supplier_name")
+                contact_name = request.form.get("contact_name")
+                contact_email = request.form.get("contact_email")
+                contact_phone = request.form.get("contact_phone")
+                type = request.form.get("type")
+                country = request.form.get("country")
+                adress = request.form.get("adress")
+                payment_terms = request.form.get("payment_terms")
+                credit_limit = request.form.get("credit_limit")
+                rating = request.form.get("rating")
+                
+                new_supplier = Suppliers(
+                    supplier_name=supplier_name,
+                    contact_name=contact_name,
+                    contact_email=contact_email,
+                    contact_phone=contact_phone,
+                    type=type,
+                    country=country,
+                    adress=adress,
+                    payment_terms=payment_terms,
+                    credit_limit=credit_limit,
+                    last_order_date = "",
+                    rating=rating
+                )
+                db.session.add(new_supplier)
+                db.session.commit()
+
+                flash("Supplier created successfully!", "success")
+                print(f"{Fore.GREEN}Supplier created successfully with ID {new_supplier.id}")
+                return redirect(url_for("products_manager"))
+            
+            except Exception as e:
+                db.session.rollback()  
+                flash("Failed to create supplier. Please try again.", "danger")
+                print(f"{Fore.RED}Error creating supplier: {e}")
+
+        else:
+            return render_template("create_new_supplier.html", user=user)
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------

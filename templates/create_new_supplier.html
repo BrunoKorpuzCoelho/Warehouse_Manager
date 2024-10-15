@@ -59,66 +59,72 @@
 
             <div class="manager-new-registration">
                 <h2>Register</h2>
-                <p>Create a new product</p>
+                <p>Create a new Supplier</p>
 
                 <form action="" method="POST">
-                    <div class="manager-new-registration-inner">
-                        <div class="new-register-user-form">
-                            <div class="manager-new-registration-input">
-
-                                <div class="manager-new-registration-label-input">
-                                    <label for="brand">Brand</label>
-                                    <select name="brand" id="brand-select" required>
-                                        <option value="">Select a brand</option>
-                                    </select>
-                                </div>
-
-                                <div class="manager-new-registration-label-input">
-                                    <label for="name">Description</label>
-                                    <input type="text" name="name" required placeholder="Product description...">
-                                </div>
-                            </div>
-
+                    <div class="manager-new-registration-inner supplier-create-container">
+                        <div class="new-register-user-form supplier-create-container">
                             <div class="manager-new-registration-input">
                                 <div class="manager-new-registration-label-input">
-                                    <label for="product_type">Product Type</label>
-                                    <select name="product_type" id="product_type-select" required>
-                                        <option value="">Select a product type</option>
-                                    </select>
+                                    <label for="supplier_name">Supplier Name</label>
+                                    <input type="text" name="supplier_name" required placeholder="Rolex">
                                 </div>
-
+                            
                                 <div class="manager-new-registration-label-input">
-                                    <label for="buy_price">Buy Price</label>
-                                    <input type="number" name="buy_price" required placeholder="5.78" class="no-spinner">
+                                    <label for="contact_name">Contact Name</label>
+                                    <input type="text" name="contact_name" required placeholder="Jonh Raymon">
                                 </div>
                             </div>
-
+                            
                             <div class="manager-new-registration-input">
                                 <div class="manager-new-registration-label-input">
-                                    <label for="margin">Margin</label>
-                                    <input type="number" name="margin" required placeholder="120" class="no-spinner">
+                                    <label for="contact_email">Contact Email</label>
+                                    <input type="email" name="contact_email" required placeholder="jonhraymon@rolex.com">
                                 </div>
-
+                            
                                 <div class="manager-new-registration-label-input">
-                                    <label for="min_recommended_stock">Minimum Recommended Stock</label>
-                                    <input type="number" name="min_recommended_stock" required placeholder="50" class="no-spinner">
+                                    <label for="contact_phone">Contact Cellphone</label>
+                                    <input type="text" name="contact_phone" required placeholder="951951951">
                                 </div>
                             </div>
-
+                            
                             <div class="manager-new-registration-input">
                                 <div class="manager-new-registration-label-input">
-                                    <label for="warehouse_section">Warehouse Section</label>
-                                    <input type="text" name="warehouse_section" required placeholder="A">
+                                    <label for="type">Supplier Type</label>
+                                    <input type="text" name="type" required placeholder="Chemicals">
                                 </div>
-
+                            
                                 <div class="manager-new-registration-label-input">
-                                    <label for="warehouse_shelf">Warehouse Shelf</label>
-                                    <input type="text" name="warehouse_shelf" required placeholder="1">
+                                    <label for="country">Supplier Country</label>
+                                    <input type="text" name="country" required placeholder="Portugal">
                                 </div>
                             </div>
-                        </div>
+                            
+                            <div class="manager-new-registration-input">
+                                <div class="manager-new-registration-label-input">
+                                    <label for="adress">Supplier Address</label>
+                                    <input type="text" name="adress" required placeholder="789 5th Avenue, 5º Andar, Nova York, NY">
+                                </div>
+                            
+                                <div class="manager-new-registration-label-input">
+                                    <label for="payment_terms">Payment Terms</label>
+                                    <input type="text" name="payment_terms" required placeholder="90 days">
+                                </div>
+                            </div>
+                            
+                            <div class="manager-new-registration-input">
+                                <div class="manager-new-registration-label-input">
+                                    <label for="credit_limit">Credit Limit</label>
+                                    <input type="text" name="credit_limit" required placeholder="5000">
+                                </div>
+                            
+                                <div class="manager-new-registration-label-input">
+                                    <label for="rating">Supplier Rating</label>
+                                    <input type="text" name="rating" required placeholder="5">
+                                </div>
+                            </div>   
+                        </div>                         
                     </div>
-                    
                     <button type="submit" class="edit-user-submit-btn">Submit</button>
                 </form>
             </div>

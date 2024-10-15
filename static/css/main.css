@@ -55,7 +55,6 @@ body {
     justify-content: center;
     align-items: center;
     font-family: Arial, Helvetica, sans-serif;
-    /* user-select: none; */
     color: var(--color-dark);
     background-color: var(--color-background);
     transition: all 0.7s ease;
@@ -2253,3 +2252,14 @@ h3 .user-manager-cards-title {
     cursor: pointer;
 }
 
+.work-shift-table a {
+    transition: 0.7s ease all;
+}
+
+.work-shift-table a:hover {
+    color: var(--color-danger);
+}
+
+.supplier-create-container {
+    width: calc(55% - 1rem);
+}
