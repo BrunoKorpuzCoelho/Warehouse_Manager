@@ -128,7 +128,7 @@ class Product(db.Model):
         self.name = name.upper()
         self.product_type = product_type
         self.brand = brand.title()
-        self.model = model.title()
+        self.model = model
         self.buy_price = buy_price
         self.sell_price = sell_price
         self.margin = margin
@@ -1189,7 +1189,11 @@ def all_products():
     all_products = Product.query.all()
     
     if request.method == "POST":
-        pass
+        product_name = request.form.get('product_name', '').lower()
+        
+        all_products = Product.query.filter(Product.name.ilike(f'%{product_name}%')).all()
+
+        return render_template("all_products_page.html", user=user, all_products=all_products)
     else:
         return render_template("all_products_page.html", user=user, all_products=all_products)
     

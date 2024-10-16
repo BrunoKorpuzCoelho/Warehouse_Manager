@@ -753,8 +753,8 @@ h3 .user-manager-cards-title {
 }
 
 .all-table {
-    height: 41rem;
-    overflow-y: scroll;
+    height: 38rem;
+    overflow-y: auto;
 }
 
 .user-detail-list table {
@@ -1058,7 +1058,7 @@ h3 .user-manager-cards-title {
     width: 80%;
     height: 39rem;
     margin: 4rem auto;
-    overflow-y: scroll;
+    overflow-y: auto;
     border-radius: var(--border-radius-1);
     padding: var(--padding-1);
     box-shadow: var(--box-shadow);
@@ -1788,7 +1788,7 @@ h3 .user-manager-cards-title {
     background-color: var(--color-white);
     box-shadow: var(--box-shadow);
     transition: 0.7s ease all;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .last_schedule_records:hover {
@@ -1965,7 +1965,7 @@ h3 .user-manager-cards-title {
     border-radius: var(--border-radius-1);
     box-shadow: var(--box-shadow);
     transition: 0.7s ease all;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .search-schedule-manager-container:hover {
